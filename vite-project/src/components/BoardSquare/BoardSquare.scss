@@ -1,0 +1,39 @@
+.board-square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+
+  &--even {
+    background-color: #adceff;
+    width: 80px;
+    height: 80px;
+  }
+
+  &__clicked {
+    position: absolute;
+    border-radius: 6px;
+    width: 90%;
+    height: 90%;
+    background-color: rgba($color: #ffffff, $alpha: 0.4);
+  }
+
+  &__possible {
+    position: absolute;
+    border-radius: 50%;
+    width: 30%;
+    height: 30%;
+    background-color: rgba($color: #ff0000, $alpha: 0.9);
+  }
+
+  &__row-col {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+}
