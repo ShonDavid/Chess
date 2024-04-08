@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { chessBoard, rowsInBoard } from "../../utils/constants";
 import BoardSquare from "../BoardSquare/BoardSquare";
-import { getPossibleOptions, onClickSquare } from "../../context/actions";
+import { setPossibleOptions, onClickSquare } from "../../context/actions";
 import { PlayerTurn } from "../../utils/types";
 import "./Board.scss";
 import IconTool from "../IconTool/IconTool";
@@ -12,9 +12,12 @@ const Board = () => {
   const { playersTools, currentPlayer, possibleOptions, chosenTool } = state;
 
   useEffect(() => {
-    console.log("lol=", playersTools);
-    dispatch(getPossibleOptions());
+    dispatch(setPossibleOptions());
   }, [currentPlayer]);
+
+  useEffect(() => {
+    console.log("lol=", possibleOptions);
+  }, [possibleOptions]);
 
   return (
     <div className="board-container">

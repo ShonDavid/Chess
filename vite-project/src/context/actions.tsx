@@ -6,11 +6,8 @@ import {
   SpecialInformation,
 } from "../utils/types";
 import {
-  bishopPossibleMove,
-  kingPossibleMove,
-  knightPossibleMove,
-  pawnPossiblePath,
-  rookPossibleMove,
+  filterSelfCheckMove,
+  getPossibleOptions,
   shouldKillPawnPassant,
 } from "../utils/utils";
 import { ActionType } from "./ActionType";
@@ -37,12 +34,12 @@ export const onClickSquare: any =
         payload: squareId,
       });
     } else if (chosenTool && isPossibleMove) {
-      let pawnToKill = shouldKillPawnPassant({
-        colRowCurrent: chosenTool,
-        ColRowDestination: squareId,
-        currentPlayerTools: playersTools[currentPlayer],
-        waitingPlayerTools: playersTools[waitingPlayer],
-      });
+      let pawnToKill = shouldKillPawnPassant(
+        chosenTool,
+        squareId,
+        playersTools[currentPlayer],
+        playersTools[waitingPlayer]
+      );
       if (pawnToKill) {
         dispatch({
           type: ActionType.MOVE_EN_PASSANT_PLAYER_TOOL,
@@ -65,49 +62,23 @@ export const onClickSquare: any =
     }
   };
 
-export const getPossibleOptions: any =
+export const setPossibleOptions: any =
   () => (dispatch: React.Dispatch<any>, getState: () => State) => {
-    const { currentPlayer, waitingPlayer, playersTools } = getState();
-    const optionsCurrentPlayer = {};
-    for (const [key, value] of Object.entries(playersTools[currentPlayer])) {
-      let [col, row] = key.split("_");
-      let correctCol = rowsInBoard.indexOf(col);
-      let correctRow = parseInt(row) - 1;
-      const params = {
-        currentPlayerTools: playersTools[currentPlayer],
-        waitingPlayerTools: playersTools[waitingPlayer],
-        path: value.path,
-        row: correctRow,
-        col: correctCol,
-      };
-      switch (value.type as any) {
-        case ChessTool.Pawn:
-          optionsCurrentPlayer[key] = pawnPossiblePath(params);
-          break;
-        case ChessTool.Knight:
-          optionsCurrentPlayer[key] = knightPossibleMove(params);
-          break;
-        case ChessTool.Rook:
-          optionsCurrentPlayer[key] = rookPossibleMove(params);
-          break;
-        case ChessTool.Bishop:
-          optionsCurrentPlayer[key] = bishopPossibleMove(params);
-          break;
-        case ChessTool.Queen:
-          optionsCurrentPlayer[key] = rookPossibleMove(params);
-          optionsCurrentPlayer[key] = {
-            ...optionsCurrentPlayer[key],
-            ...bishopPossibleMove(params),
-          };
-          break;
-        case ChessTool.King:
-          optionsCurrentPlayer[key] = kingPossibleMove(params);
-        default:
-          break;
-      }
-    }
+    const { currentPlayer, waitingPlayer, playersTools, playerToolsGraveyard } =
+      getState();
+    const optionsCurrentPlayer = getPossibleOptions({
+      currentPlayerTools: playersTools[currentPlayer],
+      waitingPlayerTools: playersTools[waitingPlayer],
+    });
+    const optionsCurrentPlayerWithoutCheck = filterSelfCheckMove(
+      playersTools,
+      currentPlayer,
+      waitingPlayer,
+      playerToolsGraveyard,
+      optionsCurrentPlayer
+    );
     return dispatch({
       type: ActionType.SET_POSSIBLE_OPTIONS,
-      payload: optionsCurrentPlayer,
+      payload: optionsCurrentPlayerWithoutCheck,
     });
   };

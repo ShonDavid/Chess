@@ -3,7 +3,11 @@ import React, { createContext, useReducer, useContext, ReactNode } from "react";
 import { firstPlayerTools, secondPlayerTools } from "../utils/constants";
 import { PlayerToolsType, PlayerTurn, PlayersToolsType } from "../utils/types";
 import { ActionType } from "./ActionType";
-import { removeAllMovedbyTwo, toolSpecialInformation } from "../utils/utils";
+import {
+  movePlayer,
+  removeAllMovedbyTwo,
+  toolSpecialInformation,
+} from "../utils/utils";
 
 export type State = {
   counter: number;
@@ -16,10 +20,6 @@ export type State = {
   playerToolsGraveyard: any;
   toolToMove: string | null;
   chosenTool: string | null;
-  currentPlayerTools: PlayerToolsType;
-  waitingPlayerTools: PlayerToolsType;
-  currentPlayerGraveyardTools: any;
-  waitingPlayerGraveyardTools: any;
 };
 
 type Action = { type: ActionType; payload: any };
@@ -38,10 +38,6 @@ const initialState: State = {
   possibleOptions: {},
   currentPlayer: PlayerTurn.Player1,
   waitingPlayer: PlayerTurn.Player2,
-  currentPlayerTools: firstPlayerTools,
-  waitingPlayerTools: secondPlayerTools,
-  currentPlayerGraveyardTools: [],
-  waitingPlayerGraveyardTools: [],
   isOnTool: false,
   toolToMove: null,
   chosenTool: null,
@@ -50,9 +46,7 @@ const initialState: State = {
 // to debug: console.log(action)
 const reducer = (state: State, action: Action): State => {
   const { payload } = action;
-  let currentPlayerTools;
-  let waitingPlayerTools;
-  let waitingPlayerGraveyardTools;
+  let stateChanges;
   switch (action.type) {
     case ActionType.SET_CHOSEN_TOOL:
       return {
@@ -65,102 +59,46 @@ const reducer = (state: State, action: Action): State => {
         possibleOptions: payload,
       };
     case ActionType.MOVE_AND_KILL_PLAYER_TOOL:
-      currentPlayerTools = removeAllMovedbyTwo(
-        state.playersTools[state.currentPlayer]
+      stateChanges = movePlayer(
+        state.playersTools,
+        state.currentPlayer,
+        state.waitingPlayer,
+        state.playerToolsGraveyard,
+        state.chosenTool,
+        payload,
+        payload
       );
-      waitingPlayerTools = removeAllMovedbyTwo(
-        state.playersTools[state.waitingPlayer]
-      );
-      waitingPlayerGraveyardTools =
-        state.playerToolsGraveyard[state.waitingPlayer];
-      currentPlayerTools[payload] =
-        currentPlayerTools[state.chosenTool as string];
-      delete currentPlayerTools[state.chosenTool as string];
-      currentPlayerTools[payload] = {
-        ...currentPlayerTools[payload],
-        specialCases: toolSpecialInformation(
-          state.chosenTool,
-          payload,
-          currentPlayerTools[payload].type,
-          currentPlayerTools[payload].specialCases
-        ),
-      };
-      waitingPlayerGraveyardTools[payload] = waitingPlayerTools[payload];
-      delete waitingPlayerTools[payload];
       return {
         ...state,
-        playersTools: {
-          ...state.playersTools,
-          [state.currentPlayer]: currentPlayerTools,
-          [state.waitingPlayer]: waitingPlayerTools,
-        },
-        playerToolsGraveyard: {
-          ...state.playerToolsGraveyard,
-          [state.waitingPlayer]: waitingPlayerGraveyardTools,
-        },
+        ...stateChanges,
       };
     case ActionType.MOVE_EN_PASSANT_PLAYER_TOOL:
-      currentPlayerTools = removeAllMovedbyTwo(
-        state.playersTools[state.currentPlayer]
+      stateChanges = movePlayer(
+        state.playersTools,
+        state.currentPlayer,
+        state.waitingPlayer,
+        state.playerToolsGraveyard,
+        state.chosenTool,
+        payload.pawnDestination,
+        payload.pawnToKill
       );
-      waitingPlayerTools = removeAllMovedbyTwo(
-        state.playersTools[state.waitingPlayer]
-      );
-      waitingPlayerGraveyardTools =
-        state.playerToolsGraveyard[state.waitingPlayer];
-      currentPlayerTools[payload.pawnDestination] =
-        currentPlayerTools[state.chosenTool as string];
-      delete currentPlayerTools[state.chosenTool as string];
-      currentPlayerTools[payload.pawnDestination] = {
-        ...currentPlayerTools[payload.pawnDestination],
-        specialCases: toolSpecialInformation(
-          state.chosenTool,
-          payload.pawnDestination,
-          currentPlayerTools[payload.pawnDestination].type,
-          currentPlayerTools[payload.pawnDestination].specialCases
-        ),
-      };
-      waitingPlayerGraveyardTools[payload.pawnToKill] =
-        waitingPlayerTools[payload.pawnToKill];
-      delete waitingPlayerTools[payload.pawnToKill];
       return {
         ...state,
-        playersTools: {
-          ...state.playersTools,
-          [state.currentPlayer]: currentPlayerTools,
-          [state.waitingPlayer]: waitingPlayerTools,
-        },
-        playerToolsGraveyard: {
-          ...state.playerToolsGraveyard,
-          [state.waitingPlayer]: waitingPlayerGraveyardTools,
-        },
+        ...stateChanges,
       };
     case ActionType.MOVE_PLAYER_TOOL:
-      currentPlayerTools = removeAllMovedbyTwo(
-        state.playersTools[state.currentPlayer]
+      stateChanges = movePlayer(
+        state.playersTools,
+        state.currentPlayer,
+        state.waitingPlayer,
+        state.playerToolsGraveyard,
+        state.chosenTool,
+        payload,
+        null
       );
-      waitingPlayerTools = removeAllMovedbyTwo(
-        state.playersTools[state.waitingPlayer]
-      );
-      currentPlayerTools[payload] =
-        currentPlayerTools[state.chosenTool as string];
-      delete currentPlayerTools[state.chosenTool as string];
-      currentPlayerTools[payload] = {
-        ...currentPlayerTools[payload],
-        specialCases: toolSpecialInformation(
-          state.chosenTool,
-          payload,
-          currentPlayerTools[payload].type,
-          currentPlayerTools[payload].specialCases
-        ),
-      };
       return {
         ...state,
-        playersTools: {
-          ...state.playersTools,
-          [state.currentPlayer]: currentPlayerTools,
-          [state.waitingPlayer]: waitingPlayerTools,
-        },
+        ...stateChanges,
       };
     case ActionType.SWITCH_PLAYER_TURN:
       return {
