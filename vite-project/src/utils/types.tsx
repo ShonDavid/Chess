@@ -3,9 +3,9 @@ export enum PlayerTurn {
   Player2 = "PLAYER_2",
 }
 
-export enum PawnPath {
-  Up = "UP",
-  Down = "DOWN",
+export enum ChessColor {
+  White = "WHITE",
+  Black = "BLACK",
 }
 
 export enum SpecialInformation {
@@ -26,8 +26,6 @@ export type PlayerToolsType = {
   [key: string]: {
     type: ChessTool;
     id: number;
-    path?: PawnPath;
-    alreadyPlayed?: boolean;
   };
 };
 

@@ -1,57 +1,40 @@
-import { ChessTool, PawnPath } from "./types";
+import { ChessTool, ChessColor } from "./types";
 
 export const firstPlayerTools = {
   a_2: {
     type: ChessTool.Pawn,
-    path: PawnPath.Up,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 1,
   },
   b_2: {
     type: ChessTool.Pawn,
-    path: PawnPath.Up,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 2,
   },
   c_2: {
     type: ChessTool.Pawn,
-    path: PawnPath.Up,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 3,
   },
   d_2: {
     type: ChessTool.Pawn,
-    path: PawnPath.Up,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 4,
   },
   e_2: {
     type: ChessTool.Pawn,
-    path: PawnPath.Up,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 5,
   },
   f_2: {
     type: ChessTool.Pawn,
-    path: PawnPath.Up,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 6,
   },
   g_2: {
     type: ChessTool.Pawn,
-    path: PawnPath.Up,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 7,
   },
   h_2: {
     type: ChessTool.Pawn,
-    path: PawnPath.Up,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 8,
   },
   a_1: {
     type: ChessTool.Rook,
-    specialCases: { neverMoved: true },
     id: 9,
   },
   b_1: {
@@ -68,7 +51,6 @@ export const firstPlayerTools = {
   },
   e_1: {
     type: ChessTool.King,
-    specialCases: { neverMoved: true },
     id: 13,
   },
   f_1: {
@@ -81,7 +63,6 @@ export const firstPlayerTools = {
   },
   h_1: {
     type: ChessTool.Rook,
-    specialCases: { neverMoved: true },
     id: 16,
   },
 };
@@ -89,55 +70,38 @@ export const firstPlayerTools = {
 export const secondPlayerTools = {
   a_7: {
     type: ChessTool.Pawn,
-    path: PawnPath.Down,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 17,
   },
   b_7: {
     type: ChessTool.Pawn,
-    path: PawnPath.Down,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 18,
   },
   c_7: {
     type: ChessTool.Pawn,
-    path: PawnPath.Down,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 19,
   },
   d_7: {
     type: ChessTool.Pawn,
-    path: PawnPath.Down,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 20,
   },
   e_7: {
     type: ChessTool.Pawn,
-    path: PawnPath.Down,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 21,
   },
   f_7: {
     type: ChessTool.Pawn,
-    path: PawnPath.Down,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 22,
   },
   g_7: {
     type: ChessTool.Pawn,
-    path: PawnPath.Down,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 23,
   },
   h_7: {
     type: ChessTool.Pawn,
-    path: PawnPath.Down,
-    specialCases: { neverMoved: true, movedByTwo: false },
     id: 24,
   },
   a_8: {
     type: ChessTool.Rook,
-    specialCases: { neverMoved: true },
     id: 25,
   },
   b_8: {
@@ -154,7 +118,6 @@ export const secondPlayerTools = {
   },
   e_8: {
     type: ChessTool.King,
-    specialCases: { neverMoved: true },
     id: 29,
   },
   f_8: {
@@ -167,10 +130,97 @@ export const secondPlayerTools = {
   },
   h_8: {
     type: ChessTool.Rook,
-    specialCases: { neverMoved: true },
     id: 32,
   },
 };
 
+export const firstPlayerPossibleOptions = {
+  a_2: {
+    a_3: true,
+    a_4: true,
+  },
+  b_2: {
+    b_3: true,
+    b_4: true,
+  },
+  c_2: {
+    c_3: true,
+    c_4: true,
+  },
+  d_2: {
+    d_3: true,
+    d_4: true,
+  },
+  e_2: {
+    e_3: true,
+    e_4: true,
+  },
+  f_2: {
+    f_3: true,
+    f_4: true,
+  },
+  g_2: {
+    g_3: true,
+    g_4: true,
+  },
+  h_2: {
+    h_3: true,
+    h_4: true,
+  },
+  b_1: {
+    c_3: true,
+    a_3: true,
+  },
+  g_1: {
+    h_3: true,
+    f_3: true,
+  },
+};
+
+export const whitePlayerSpecialInformation = {
+  kingMoved: false,
+  rookMoved: { a: false, h: false },
+  pawnMoved: {
+    a: false,
+    b: false,
+    c: false,
+    d: false,
+    e: false,
+    f: false,
+    g: false,
+    h: false,
+  },
+  pawnMovedTwiceNow: null,
+  color: ChessColor.White,
+};
+
+export const blackPlayerSpecialInformation = {
+  kingMoved: false,
+  rookMoved: { a: false, h: false },
+  pawnMoved: {
+    a: false,
+    b: false,
+    c: false,
+    d: false,
+    e: false,
+    f: false,
+    g: false,
+    h: false,
+  },
+  pawnMovedTwiceNow: null,
+  color: ChessColor.Black,
+};
+
 export const chessBoard = Array.from({ length: 8 }, () => Array(8).fill(null));
-export const rowsInBoard = ["a", "b", "c", "d", "e", "f", "g", "h"];
+export const colsInBoard = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+export enum ColsInBoard {
+  a = 0,
+  b = 1,
+  c = 2,
+  d = 3,
+  e = 4,
+  f = 5,
+  g = 6,
+  h = 7,
+}

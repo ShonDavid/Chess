@@ -1,13 +1,15 @@
 // AppContext.tsx
 import React, { createContext, useReducer, useContext, ReactNode } from "react";
-import { firstPlayerTools, secondPlayerTools } from "../utils/constants";
+import {
+  blackPlayerSpecialInformation,
+  firstPlayerPossibleOptions,
+  firstPlayerTools,
+  secondPlayerTools,
+  whitePlayerSpecialInformation,
+} from "../utils/constants";
 import { PlayerToolsType, PlayerTurn, PlayersToolsType } from "../utils/types";
 import { ActionType } from "./ActionType";
-import {
-  movePlayer,
-  removeAllMovedbyTwo,
-  toolSpecialInformation,
-} from "../utils/utils";
+import { moveSetPiece } from "../utils/utils";
 
 export type State = {
   counter: number;
@@ -16,6 +18,7 @@ export type State = {
   waitingPlayer: PlayerTurn;
   isOnTool: boolean;
   playersTools: PlayersToolsType;
+  playersSpecialInformation: any;
   possibleOptions: any;
   playerToolsGraveyard: any;
   toolToMove: string | null;
@@ -27,6 +30,10 @@ type Action = { type: ActionType; payload: any };
 const initialState: State = {
   counter: 0,
   user: null,
+  playersSpecialInformation: {
+    [PlayerTurn.Player1]: whitePlayerSpecialInformation,
+    [PlayerTurn.Player2]: blackPlayerSpecialInformation,
+  },
   playersTools: {
     [PlayerTurn.Player1]: firstPlayerTools,
     [PlayerTurn.Player2]: secondPlayerTools,
@@ -35,7 +42,7 @@ const initialState: State = {
     [PlayerTurn.Player1]: [],
     [PlayerTurn.Player2]: [],
   },
-  possibleOptions: {},
+  possibleOptions: firstPlayerPossibleOptions,
   currentPlayer: PlayerTurn.Player1,
   waitingPlayer: PlayerTurn.Player2,
   isOnTool: false,
@@ -59,7 +66,7 @@ const reducer = (state: State, action: Action): State => {
         possibleOptions: payload,
       };
     case ActionType.MOVE_AND_KILL_PLAYER_TOOL:
-      stateChanges = movePlayer(
+      stateChanges = moveSetPiece(
         state.playersTools,
         state.currentPlayer,
         state.waitingPlayer,
@@ -73,7 +80,7 @@ const reducer = (state: State, action: Action): State => {
         ...stateChanges,
       };
     case ActionType.MOVE_EN_PASSANT_PLAYER_TOOL:
-      stateChanges = movePlayer(
+      stateChanges = moveSetPiece(
         state.playersTools,
         state.currentPlayer,
         state.waitingPlayer,
@@ -87,7 +94,7 @@ const reducer = (state: State, action: Action): State => {
         ...stateChanges,
       };
     case ActionType.MOVE_PLAYER_TOOL:
-      stateChanges = movePlayer(
+      stateChanges = moveSetPiece(
         state.playersTools,
         state.currentPlayer,
         state.waitingPlayer,

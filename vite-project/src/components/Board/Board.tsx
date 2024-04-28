@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
-import { chessBoard, rowsInBoard } from "../../utils/constants";
+import { chessBoard, colsInBoard } from "../../utils/constants";
 import BoardSquare from "../BoardSquare/BoardSquare";
-import { setPossibleOptions, onClickSquare } from "../../context/actions";
+import { setPossibleOptions, onClickSquare, setIsKingUnderAttack } from "../../context/actions";
 import { PlayerTurn } from "../../utils/types";
 import "./Board.scss";
 import IconTool from "../IconTool/IconTool";
@@ -16,8 +16,9 @@ const Board = () => {
   }, [currentPlayer]);
 
   useEffect(() => {
-    console.log("lol=", possibleOptions);
-  }, [possibleOptions]);
+    dispatch(setIsKingUnderAttack());
+  }, [possibleOptions])
+  
 
   return (
     <div className="board-container">
@@ -25,7 +26,7 @@ const Board = () => {
         {chessBoard.map((col, colIndex) => (
           <div className="board__col" key={colIndex}>
             {col.map((_, rowIndex) => {
-              let columnBoard = rowsInBoard[rowIndex];
+              let columnBoard = colsInBoard[rowIndex];
               let rowBoard = 8 - colIndex;
               let colRow = `${columnBoard}_${rowBoard}`;
               let isPossibleMove = !!(
