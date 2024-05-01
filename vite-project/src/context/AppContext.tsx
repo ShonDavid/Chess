@@ -31,20 +31,20 @@ const initialState: State = {
   counter: 0,
   user: null,
   playersSpecialInformation: {
-    [PlayerTurn.Player1]: whitePlayerSpecialInformation,
-    [PlayerTurn.Player2]: blackPlayerSpecialInformation,
+    [PlayerTurn.White]: whitePlayerSpecialInformation,
+    [PlayerTurn.Black]: blackPlayerSpecialInformation,
   },
   playersTools: {
-    [PlayerTurn.Player1]: firstPlayerTools,
-    [PlayerTurn.Player2]: secondPlayerTools,
+    [PlayerTurn.White]: firstPlayerTools,
+    [PlayerTurn.Black]: secondPlayerTools,
   },
   playerToolsGraveyard: {
-    [PlayerTurn.Player1]: [],
-    [PlayerTurn.Player2]: [],
+    [PlayerTurn.White]: [],
+    [PlayerTurn.Black]: [],
   },
   possibleOptions: firstPlayerPossibleOptions,
-  currentPlayer: PlayerTurn.Player1,
-  waitingPlayer: PlayerTurn.Player2,
+  currentPlayer: PlayerTurn.White,
+  waitingPlayer: PlayerTurn.Black,
   isOnTool: false,
   toolToMove: null,
   chosenTool: null,
@@ -53,6 +53,7 @@ const initialState: State = {
 // to debug: console.log(action)
 const reducer = (state: State, action: Action): State => {
   const { payload } = action;
+  console.log(action);
   let stateChanges;
   switch (action.type) {
     case ActionType.SET_CHOSEN_TOOL:

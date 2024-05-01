@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { chessBoard, colsInBoard } from "../../utils/constants";
 import BoardSquare from "../BoardSquare/BoardSquare";
-import { setPossibleOptions, onClickSquare, setIsKingUnderAttack } from "../../context/actions";
+import {
+  setPossibleOptions,
+  onClickSquare,
+  setIsKingUnderAttack,
+} from "../../context/actions";
 import { PlayerTurn } from "../../utils/types";
 import "./Board.scss";
 import IconTool from "../IconTool/IconTool";
@@ -17,8 +21,7 @@ const Board = () => {
 
   useEffect(() => {
     dispatch(setIsKingUnderAttack());
-  }, [possibleOptions])
-  
+  }, [possibleOptions]);
 
   return (
     <div className="board-container">
@@ -44,14 +47,14 @@ const Board = () => {
                   onClick={() => dispatch(onClickSquare(colRow))}
                   isPossibleMove={isPossibleMove}
                 >
-                  {colRow in playersTools[PlayerTurn.Player1] ? (
+                  {colRow in playersTools[PlayerTurn.White] ? (
                     <IconTool
-                      name={playersTools[PlayerTurn.Player1][colRow].type}
+                      name={playersTools[PlayerTurn.White][colRow].type}
                     />
                   ) : null}
-                  {colRow in playersTools[PlayerTurn.Player2] ? (
+                  {colRow in playersTools[PlayerTurn.Black] ? (
                     <IconTool
-                      name={playersTools[PlayerTurn.Player2][colRow].type}
+                      name={playersTools[PlayerTurn.Black][colRow].type}
                       fill={true}
                     />
                   ) : null}

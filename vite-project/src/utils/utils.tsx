@@ -18,7 +18,15 @@ const convertRowAndColToKey = (col: number, row: number) => {
 
 export const pawnPossiblePath = (params) => {
   const paths: any = {};
-  const { path, col, row, currentPlayerTools, waitingPlayerTools, currentPlayerSpecialInformation, waitingPlayerSpecialInformation } = params;
+  const {
+    path,
+    col,
+    row,
+    currentPlayerTools,
+    waitingPlayerTools,
+    currentPlayerSpecialInformation,
+    waitingPlayerSpecialInformation,
+  } = params;
 
   const direction = path === ChessColor.White ? 1 : -1;
 
@@ -212,7 +220,14 @@ export const queenPossibleMove = (params) => {
 
 export const kingPossibleMove = (params) => {
   const paths: any = {};
-  const { col, row, path, currentPlayerTools, waitingPlayerTools, currentPlayerSpecialInformation} = params;
+  const {
+    col,
+    row,
+    path,
+    currentPlayerTools,
+    waitingPlayerTools,
+    currentPlayerSpecialInformation,
+  } = params;
 
   const directions = [
     [1, 0],
@@ -244,12 +259,9 @@ export const kingPossibleMove = (params) => {
     }
   });
 
-  if (
-    !currentPlayerSpecialInformation.kingMoved
-  ) {
+  if (!currentPlayerSpecialInformation.kingMoved) {
     let rightCastling = currentPlayerSpecialInformation.rookMoved.h;
-    let leftCastling =
-    currentPlayerSpecialInformation.rookMoved.a;
+    let leftCastling = currentPlayerSpecialInformation.rookMoved.a;
     for (let index = 1; index <= 3; index++) {
       if (index <= 2) {
         if (
@@ -362,48 +374,51 @@ export const shouldKillPawnPassant = (
   }
 };
 
-export const killSetPiece = (
-  pieceToKill,
-  playerPieces,
-) => {
+export const killSetPiece = (pieceToKill, playerPieces) => {
   let newPlayerPieces = { ...playerPieces };
   delete newPlayerPieces[pieceToKill];
   return newPlayerPieces;
-}
+};
 
 export const moveSetPieceChangeName = (
   colRowCurrent,
   colRowDestination,
-  playerTools,
+  playerTools
 ) => {
   let newPlayerTools = { ...playerTools };
   newPlayerTools[colRowDestination] = newPlayerTools[colRowCurrent];
   delete newPlayerTools[colRowCurrent];
-}
+  return newPlayerTools;
+};
 
 export const killSetPieceAndAddToGraveyard = (
   pieceToKill,
   playerPieces,
-  graveyardPieces,
+  graveyardPieces
 ) => {
   let newPlayerPieces = { ...playerPieces };
   let newGraveyardPieces = [...graveyardPieces, playerPieces[pieceToKill]];
   delete newPlayerPieces[pieceToKill];
   return [newPlayerPieces, newGraveyardPieces];
-}
+};
 
-export const changeSpecialInformation = (playerPieces, playerSpecialInformation, colRowCurrent, colRowDestination) => {
-  const newPlayerSpecialInformation = {...playerSpecialInformation};
+export const changeSpecialInformation = (
+  playerPieces,
+  playerSpecialInformation,
+  colRowCurrent,
+  colRowDestination
+) => {
+  const newPlayerSpecialInformation = { ...playerSpecialInformation };
   let [curCol, curRow] = colRowCurrent.split("_");
   let [destinationCol, destinationRow] = colRowDestination.split("_");
-  if(playerPieces[colRowCurrent].type === ChessTool.Pawn) {
+  if (playerPieces[colRowCurrent].type === ChessTool.Pawn) {
     newPlayerSpecialInformation.pawnMoved[ColsInBoard[curCol]] = true;
-    if(Math.abs(parseInt(curRow) - parseInt(destinationRow)) === 2) {
+    if (Math.abs(parseInt(curRow) - parseInt(destinationRow)) === 2) {
       newPlayerSpecialInformation.pawnMovedTwiceNow = colRowDestination;
     }
   }
   return newPlayerSpecialInformation;
-}
+};
 
 export const moveSetPiece = (
   playersTools,
@@ -414,16 +429,24 @@ export const moveSetPiece = (
   colRowDestination,
   colRowToKill
 ) => {
-
   let currentPlayerTools = playersTools[currentPlayer];
   let waitingPlayerTools = playersTools[waitingPlayer];
   let waitingPlayerGraveyardTools = playerToolsGraveyard[waitingPlayer];
 
-  const currentPlayerSpecialInformation = changeSpecialInformation(currentPlayerTools, playersSpecialInformation[currentPlayer], colRowCurrent, colRowDestination);
+  // const currentPlayerSpecialInformation = changeSpecialInformation(currentPlayerTools, playersSpecialInformation[currentPlayer], colRowCurrent, colRowDestination);
+  currentPlayerTools = moveSetPieceChangeName(
+    colRowCurrent,
+    colRowDestination,
+    currentPlayerTools
+  );
 
-  currentPlayerTools = moveSetPieceChangeName(colRowCurrent, colRowDestination, currentPlayerTools);
-  if(colRowToKill) {
-   [waitingPlayerTools, waitingPlayerGraveyardTools] = killSetPieceAndAddToGraveyard(colRowToKill, waitingPlayerTools, waitingPlayerGraveyardTools);
+  if (colRowToKill) {
+    [waitingPlayerTools, waitingPlayerGraveyardTools] =
+      killSetPieceAndAddToGraveyard(
+        colRowToKill,
+        waitingPlayerTools,
+        waitingPlayerGraveyardTools
+      );
   }
 
   // // handle special cases for the tool who played the game
@@ -458,7 +481,6 @@ export const getPossibleOptions = (myParams) => {
     waitingPlayerSpecialInformation,
   } = myParams;
   const optionsCurrentPlayer = {};
-  console.log("currentPlayerSpecialInformation", currentPlayerSpecialInformation);
   for (const [key, value] of Object.entries(currentPlayerTools)) {
     let [col, row] = key.split("_");
     let correctCol = colsInBoard.indexOf(col);
@@ -506,6 +528,7 @@ export const filterSelfCheckMove = (
   currentPlayer,
   waitingPlayer,
   playerToolsGraveyard,
+  playersSpecialInformation,
   possibleOptions
 ) => {
   const validMoves = {};
@@ -541,8 +564,10 @@ export const filterSelfCheckMove = (
       let possibleOpponentOptions = getPossibleOptions({
         currentPlayerTools: updatedPlayerTools[waitingPlayer],
         waitingPlayerTools: updatedPlayerTools[currentPlayer],
-        currentPlayerSpecialInformation: playersSpecialInformation[currentPlayer],
-        waitingPlayerSpecialInformation: playersSpecialInformation[waitingPlayer],
+        currentPlayerSpecialInformation:
+          playersSpecialInformation[currentPlayer],
+        waitingPlayerSpecialInformation:
+          playersSpecialInformation[waitingPlayer],
       });
 
       if (

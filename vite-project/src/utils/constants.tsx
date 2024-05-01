@@ -190,7 +190,7 @@ export const whitePlayerSpecialInformation = {
     g: false,
     h: false,
   },
-  pawnMovedTwiceNow: null,
+  pawnMovedTwiceNow: "",
   color: ChessColor.White,
 };
 
@@ -207,7 +207,7 @@ export const blackPlayerSpecialInformation = {
     g: false,
     h: false,
   },
-  pawnMovedTwiceNow: null,
+  pawnMovedTwiceNow: "",
   color: ChessColor.Black,
 };
 

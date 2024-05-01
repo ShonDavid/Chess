@@ -60,7 +60,7 @@ export const onClickSquare: any =
       //     type: ActionType.MOVE_CASTLING_PLAYER_TOOL,
       //     payload: { kingDestination: squareId, rookDestination: (squareId.split("_")[0] === 'c'? "d": "f")+ "_" + chosenTool.split("_")[1] },
       //   });
-      // } else 
+      // } else
       if (playersTools[waitingPlayer][squareId]) {
         dispatch({
           type: ActionType.MOVE_AND_KILL_PLAYER_TOOL,
@@ -80,9 +80,14 @@ export const onClickSquare: any =
 
 export const setPossibleOptions: any =
   () => (dispatch: React.Dispatch<any>, getState: () => State) => {
-    const { currentPlayer, waitingPlayer, playersTools, playerToolsGraveyard, playersSpecialInformation } =
-      getState();
-    
+    const {
+      currentPlayer,
+      waitingPlayer,
+      playersTools,
+      playerToolsGraveyard,
+      playersSpecialInformation,
+    } = getState();
+
     const optionsCurrentPlayer = getPossibleOptions({
       currentPlayerTools: playersTools[currentPlayer],
       waitingPlayerTools: playersTools[waitingPlayer],
@@ -90,24 +95,30 @@ export const setPossibleOptions: any =
       waitingPlayerSpecialInformation: playersSpecialInformation[waitingPlayer],
     });
 
-    // const optionsCurrentPlayerWithoutCheck = filterSelfCheckMove(
-    //   playersTools,
-    //   currentPlayer,
-    //   waitingPlayer,
-    //   playerToolsGraveyard,
-    //   optionsCurrentPlayer
-    // );
+    const optionsCurrentPlayerWithoutCheck = filterSelfCheckMove(
+      playersTools,
+      currentPlayer,
+      waitingPlayer,
+      playerToolsGraveyard,
+      playersSpecialInformation,
+      optionsCurrentPlayer
+    );
 
     return dispatch({
       type: ActionType.SET_POSSIBLE_OPTIONS,
-      payload: optionsCurrentPlayer,
+      payload: optionsCurrentPlayerWithoutCheck,
     });
   };
 
 export const setIsKingUnderAttack: any =
   () => (dispatch: React.Dispatch<any>, getState: () => State) => {
-    const { currentPlayer, waitingPlayer, playersTools, possibleOptions, playersSpecialInformation} =
-      getState();
+    const {
+      currentPlayer,
+      waitingPlayer,
+      playersTools,
+      possibleOptions,
+      playersSpecialInformation,
+    } = getState();
     const optionsOpponentPlayer = getPossibleOptions({
       currentPlayerTools: playersTools[waitingPlayer],
       waitingPlayerTools: playersTools[currentPlayer],

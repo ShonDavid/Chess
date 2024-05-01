@@ -1,6 +1,6 @@
 export enum PlayerTurn {
-  Player1 = "PLAYER_1",
-  Player2 = "PLAYER_2",
+  White = "WHITE",
+  Black = "BLACK",
 }
 
 export enum ChessColor {
