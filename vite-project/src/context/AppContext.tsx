@@ -9,7 +9,7 @@ import {
 } from "../utils/constants";
 import { PlayerToolsType, PlayerTurn, PlayersToolsType } from "../utils/types";
 import { ActionType } from "./ActionType";
-import { moveSetPiece } from "../utils/utils";
+import { changeSpecialInformation, moveSetPiece, moveSetPieceAndChangeSpecialInformation } from "../utils/utils";
 
 export type State = {
   counter: number;
@@ -62,27 +62,30 @@ const reducer = (state: State, action: Action): State => {
         chosenTool: payload,
       };
     case ActionType.SET_POSSIBLE_OPTIONS:
+      console.log("playersSpecialInformation=", state.playersSpecialInformation);
       return {
         ...state,
         possibleOptions: payload,
       };
     case ActionType.MOVE_AND_KILL_PLAYER_TOOL:
-      stateChanges = moveSetPiece(
+      stateChanges = moveSetPieceAndChangeSpecialInformation(
         state.playersTools,
+        state.playersSpecialInformation,
         state.currentPlayer,
         state.waitingPlayer,
         state.playerToolsGraveyard,
-        state.chosenTool,
-        payload,
-        payload
+        payload.currentPosition,
+        payload.destination,
+        payload.killSetPiece
       );
       return {
         ...state,
         ...stateChanges,
       };
     case ActionType.MOVE_EN_PASSANT_PLAYER_TOOL:
-      stateChanges = moveSetPiece(
+      stateChanges = moveSetPieceAndChangeSpecialInformation(
         state.playersTools,
+        state.playersSpecialInformation,
         state.currentPlayer,
         state.waitingPlayer,
         state.playerToolsGraveyard,
@@ -94,16 +97,34 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         ...stateChanges,
       };
-    case ActionType.MOVE_PLAYER_TOOL:
-      stateChanges = moveSetPiece(
+    case ActionType.MOVE_CASTLING_PLAYER_TOOL:
+      stateChanges = moveSetPieceAndChangeSpecialInformation(
         state.playersTools,
+        state.playersSpecialInformation,
         state.currentPlayer,
         state.waitingPlayer,
         state.playerToolsGraveyard,
         state.chosenTool,
-        payload,
+        payload.kingDestination,
         null
       );
+      return {
+        ...state,
+        ...stateChanges,
+      };
+    case ActionType.MOVE_PLAYER_TOOL:
+      console.log("playersSpecialInformation", state.playersSpecialInformation)
+      stateChanges = moveSetPieceAndChangeSpecialInformation(
+        state.playersTools,
+        state.playersSpecialInformation,
+        state.currentPlayer,
+        state.waitingPlayer,
+        state.playerToolsGraveyard,
+        payload.currentPosition,
+        payload.destination,
+        null
+      );
+      console.log("stateChanges", stateChanges);
       return {
         ...state,
         ...stateChanges,

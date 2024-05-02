@@ -13,7 +13,7 @@ import IconTool from "../IconTool/IconTool";
 
 const Board = () => {
   const { state, dispatch } = useAppContext();
-  const { playersTools, currentPlayer, possibleOptions, chosenTool } = state;
+  const { playersTools, currentPlayer, possibleOptions, chosenTool, playersSpecialInformation} = state;
 
   useEffect(() => {
     dispatch(setPossibleOptions());
@@ -22,6 +22,11 @@ const Board = () => {
   useEffect(() => {
     dispatch(setIsKingUnderAttack());
   }, [possibleOptions]);
+
+  // useEffect(() => {
+  //   console.log("playersSpecialInformation", playersSpecialInformation);
+  // }, [playersSpecialInformation])
+  
 
   return (
     <div className="board-container">

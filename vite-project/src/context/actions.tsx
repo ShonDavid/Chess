@@ -1,14 +1,10 @@
-import { ColsInBoard, colsInBoard } from "../utils/constants";
-import {
-  ChessTool,
-  ChessColor,
-  PlayerToolsType,
-  SpecialInformation,
-} from "../utils/types";
+import { ColsInBoard } from "../utils/constants";
+import { ChessTool } from "../utils/types";
 import {
   filterSelfCheckMove,
   getPossibleOptions,
   isKingInAttack,
+  killSetPiece,
   shouldKillPawnPassant,
 } from "../utils/utils";
 import { ActionType } from "./ActionType";
@@ -23,6 +19,7 @@ export const onClickSquare: any =
       chosenTool,
       playersTools,
       possibleOptions,
+      playersSpecialInformation,
     } = getState();
 
     let isPossibleMove = !!(
@@ -36,42 +33,65 @@ export const onClickSquare: any =
         payload: squareId,
       });
     } else if (chosenTool && isPossibleMove) {
-      // let pawnToKill = shouldKillPawnPassant(
-      //   chosenTool,
-      //   squareId,
-      //   playersTools[currentPlayer],
-      //   playersTools[waitingPlayer]
-      // );
-      // if (pawnToKill) {
-      //   console.log("En passant!");
-      //   dispatch({
-      //     type: ActionType.MOVE_EN_PASSANT_PLAYER_TOOL,
-      //     payload: { pawnToKill, pawnDestination: squareId },
-      //   });
-      //handle castling
-      // } else if (
-      //   playersTools[currentPlayer][chosenTool].type === ChessTool.King &&
-      //   Math.abs(
-      //     ColsInBoard[chosenTool.split("_")[0]] -
-      //       ColsInBoard[squareId.split("_")[0]]
-      //   ) > 1
-      // ) {
-      //   dispatch({
-      //     type: ActionType.MOVE_CASTLING_PLAYER_TOOL,
-      //     payload: { kingDestination: squareId, rookDestination: (squareId.split("_")[0] === 'c'? "d": "f")+ "_" + chosenTool.split("_")[1] },
-      //   });
-      // } else
-      if (playersTools[waitingPlayer][squareId]) {
+      if (
+        playersTools[currentPlayer][chosenTool].type === ChessTool.Pawn &&
+        chosenTool.split("_")[0] !== squareId.split("_")[0] &&
+        !(squareId in playersTools[waitingPlayer])
+      ) {
+        console.log("En passant!");
+        dispatch({
+          type: ActionType.MOVE_EN_PASSANT_PLAYER_TOOL,
+          payload: {
+            pawnToKill:
+              playersSpecialInformation[waitingPlayer].pawnMovedTwiceNow,
+            pawnDestination: squareId,
+          },
+        });
+        // handle castling
+      } else if (
+        playersTools[currentPlayer][chosenTool].type === ChessTool.King &&
+        Math.abs(
+          parseInt(ColsInBoard[chosenTool.split("_")[0]]) -
+            parseInt(ColsInBoard[squareId.split("_")[0]])
+        ) > 1
+      ) {
+        //  move king
+        dispatch({
+          type: ActionType.MOVE_PLAYER_TOOL,
+          payload: { currentPosition: chosenTool, destination: squareId },
+        });
+
+        // move rook
+        dispatch({
+          type: ActionType.MOVE_PLAYER_TOOL,
+          payload: {
+            currentPosition:
+              (squareId.split("_")[0] === "c" ? "a" : "h") +
+              "_" +
+              chosenTool.split("_")[1],
+            destination:
+              (squareId.split("_")[0] === "c" ? "d" : "f") +
+              "_" +
+              squareId.split("_")[1],
+          },
+        });
+      } else if (playersTools[waitingPlayer][squareId]) {
         dispatch({
           type: ActionType.MOVE_AND_KILL_PLAYER_TOOL,
-          payload: squareId,
+          payload: {
+            currentPosition: chosenTool,
+            destination: squareId,
+            killSetPiece: squareId,
+          },
         });
       } else {
         dispatch({
           type: ActionType.MOVE_PLAYER_TOOL,
-          payload: squareId,
+          payload: { currentPosition: chosenTool, destination: squareId },
         });
       }
+
+      // switch player turn after move
       return dispatch({
         type: ActionType.SWITCH_PLAYER_TURN,
       });
@@ -88,25 +108,25 @@ export const setPossibleOptions: any =
       playersSpecialInformation,
     } = getState();
 
-    const optionsCurrentPlayer = getPossibleOptions({
-      currentPlayerTools: playersTools[currentPlayer],
-      waitingPlayerTools: playersTools[waitingPlayer],
-      currentPlayerSpecialInformation: playersSpecialInformation[currentPlayer],
-      waitingPlayerSpecialInformation: playersSpecialInformation[waitingPlayer],
-    });
-
-    const optionsCurrentPlayerWithoutCheck = filterSelfCheckMove(
-      playersTools,
-      currentPlayer,
-      waitingPlayer,
-      playerToolsGraveyard,
-      playersSpecialInformation,
-      optionsCurrentPlayer
+    const optionsCurrentPlayer = getPossibleOptions(
+      playersTools[currentPlayer],
+      playersTools[waitingPlayer],
+      playersSpecialInformation[currentPlayer],
+      playersSpecialInformation[waitingPlayer]
     );
+
+    // const optionsCurrentPlayerWithoutCheck = filterSelfCheckMove(
+    //   playersTools,
+    //   currentPlayer,
+    //   waitingPlayer,
+    //   playerToolsGraveyard,
+    //   playersSpecialInformation,
+    //   optionsCurrentPlayer
+    // );
 
     return dispatch({
       type: ActionType.SET_POSSIBLE_OPTIONS,
-      payload: optionsCurrentPlayerWithoutCheck,
+      payload: optionsCurrentPlayer,
     });
   };
 
@@ -119,12 +139,12 @@ export const setIsKingUnderAttack: any =
       possibleOptions,
       playersSpecialInformation,
     } = getState();
-    const optionsOpponentPlayer = getPossibleOptions({
-      currentPlayerTools: playersTools[waitingPlayer],
-      waitingPlayerTools: playersTools[currentPlayer],
-      currentPlayerSpecialInformation: playersSpecialInformation[currentPlayer],
-      waitingPlayerSpecialInformation: playersSpecialInformation[waitingPlayer],
-    });
+    const optionsOpponentPlayer = getPossibleOptions(
+      playersTools[waitingPlayer],
+      playersTools[currentPlayer],
+      playersSpecialInformation[waitingPlayer],
+      playersSpecialInformation[currentPlayer],
+    );
     const isCheck = isKingInAttack(
       optionsOpponentPlayer,
       playersTools[currentPlayer]

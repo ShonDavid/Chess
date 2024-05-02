@@ -7,16 +7,7 @@ const convertRowAndColToKey = (col: number, row: number) => {
   return `${colString}_${rowString}`;
 };
 
-// const getPossibleOptions = (
-//   currentPlayerTools,
-//   waitingPlayerTools,
-//   type,
-//   col,
-//   row,
-//   path = null
-// ) => {};
-
-export const pawnPossiblePath = (params) => {
+export const pawnPossibleMove = (params) => {
   const paths: any = {};
   const {
     path,
@@ -26,6 +17,7 @@ export const pawnPossiblePath = (params) => {
     waitingPlayerTools,
     currentPlayerSpecialInformation,
     waitingPlayerSpecialInformation,
+    id,
   } = params;
 
   const direction = path === ChessColor.White ? 1 : -1;
@@ -40,9 +32,8 @@ export const pawnPossiblePath = (params) => {
 
     // Initial two-square forward move
     const forwardMove2: any = convertRowAndColToKey(col, row + 2 * direction);
-
     if (
-      !currentPlayerSpecialInformation.pawnMoved[ColsInBoard[col]] &&
+      !currentPlayerSpecialInformation.pawnMoved[id] &&
       !(forwardMove2 in waitingPlayerTools) &&
       !(forwardMove2 in currentPlayerTools)
     ) {
@@ -51,9 +42,9 @@ export const pawnPossiblePath = (params) => {
   }
 
   // Diagonal captures
-  const diagonalDirectionleft = convertRowAndColToKey(col - 1, row + direction);
-  if (waitingPlayerTools[diagonalDirectionleft]) {
-    paths[diagonalDirectionleft] = true;
+  const diagonalDirectionLeft = convertRowAndColToKey(col - 1, row + direction);
+  if (waitingPlayerTools[diagonalDirectionLeft]) {
+    paths[diagonalDirectionLeft] = true;
   }
   const diagonalDirectionRight = convertRowAndColToKey(
     col + 1,
@@ -67,10 +58,10 @@ export const pawnPossiblePath = (params) => {
   const passantRight = convertRowAndColToKey(col + 1, row);
   if (
     passantLeft in waitingPlayerTools &&
-    !(diagonalDirectionleft in currentPlayerTools) &&
+    !(diagonalDirectionLeft in currentPlayerTools) &&
     waitingPlayerSpecialInformation.pawnMovedTwiceNow === passantLeft
   ) {
-    paths[diagonalDirectionleft] = true;
+    paths[diagonalDirectionLeft] = true;
   }
   if (
     passantRight in waitingPlayerTools &&
@@ -180,44 +171,6 @@ export const bishopPossibleMove = (params) => {
   return paths;
 };
 
-export const queenPossibleMove = (params) => {
-  const paths: any = {};
-  const { col, row, currentPlayerTools, waitingPlayerTools } = params;
-
-  const directions = [
-    [1, 0],
-    [0, 1],
-    [-1, 0],
-    [0, -1],
-    [-1, -1],
-    [-1, 1],
-    [1, -1],
-    [1, 1],
-  ];
-  directions.map(([dx, dy]) => {
-    for (let index = 1; index <= 8; index++) {
-      const newCol = col + dx * index;
-      const newRow = row + dy * index;
-      const colRow = convertRowAndColToKey(newCol, newRow);
-      if (
-        colRow in currentPlayerTools ||
-        newCol < 0 ||
-        newCol > 7 ||
-        newRow < 0 ||
-        newRow > 7
-      ) {
-        break;
-      } else if (colRow in waitingPlayerTools) {
-        paths[colRow] = true;
-        break;
-      } else {
-        paths[colRow] = true;
-      }
-    }
-  });
-  return paths;
-};
-
 export const kingPossibleMove = (params) => {
   const paths: any = {};
   const {
@@ -260,8 +213,8 @@ export const kingPossibleMove = (params) => {
   });
 
   if (!currentPlayerSpecialInformation.kingMoved) {
-    let rightCastling = currentPlayerSpecialInformation.rookMoved.h;
-    let leftCastling = currentPlayerSpecialInformation.rookMoved.a;
+    let rightCastling = !currentPlayerSpecialInformation.rookMoved.h;
+    let leftCastling = !currentPlayerSpecialInformation.rookMoved.a;
     for (let index = 1; index <= 3; index++) {
       if (index <= 2) {
         if (
@@ -293,51 +246,14 @@ export const kingPossibleMove = (params) => {
   return paths;
 };
 
-export const toolSpecialInformation = (
-  colRowCurrent,
-  colRowDestination,
-  type,
-  specialCases
-) => {
-  let [curCol, curRow] = colRowCurrent.split("_");
-  let [destinationCol, destinationRow] = colRowDestination.split("_");
-
-  switch (type) {
-    case ChessTool.Pawn:
-      return {
-        ...specialCases,
-        neverMoved: false,
-        movedByTwo:
-          curCol === destinationCol &&
-          (parseInt(curRow) === parseInt(destinationRow) - 2 ||
-            parseInt(curRow) === parseInt(destinationRow) + 2),
-      };
-    case ChessTool.Rook:
-      return { ...specialCases, neverMoved: false };
-    case ChessTool.King:
-      return { ...specialCases, neverMoved: false };
-    default:
-      return false;
-  }
-};
-
-//Any time the user move a piece, we need to remove the movedByTwo flag on all the pawns.
-//En-passant can happen only on the first move of the pawn.
-export const removeAllMovedbyTwo = (playerTools) => {
-  const newPlayerTools = { ...playerTools };
-  Object.keys(newPlayerTools).forEach((key) => {
-    if (newPlayerTools[key]?.specialCases?.movedByTwo) {
-      newPlayerTools[key].specialCases.movedByTwo = false;
-    }
-  });
-  return newPlayerTools;
-};
-
+//TODO: maybe delete this function
 export const shouldKillPawnPassant = (
   colRowCurrent,
   ColRowDestination,
   currentPlayerTools,
-  waitingPlayerTools
+  waitingPlayerTools,
+  currentPlayerSpecialInformation,
+  waitingPlayerSpecialInformation
 ) => {
   let [col, row] = colRowCurrent.split("_");
   col = ColsInBoard[col];
@@ -350,7 +266,7 @@ export const shouldKillPawnPassant = (
   const direction =
     currentPlayerTools[colRowCurrent].path === ChessColor.White ? 1 : -1;
 
-  const diagonalDirectionleft = convertRowAndColToKey(col - 1, row + direction);
+  const diagonalDirectionLeft = convertRowAndColToKey(col - 1, row + direction);
   const diagonalDirectionRight = convertRowAndColToKey(
     col + 1,
     row + direction
@@ -359,13 +275,13 @@ export const shouldKillPawnPassant = (
   const pawnRightToKill = convertRowAndColToKey(col + 1, row);
   if (
     pawnLeftToKill in waitingPlayerTools &&
-    waitingPlayerTools[pawnLeftToKill].specialCases.movedByTwo &&
-    ColRowDestination === diagonalDirectionleft
+    waitingPlayerSpecialInformation.pawnMovedTwiceNow === pawnLeftToKill &&
+    ColRowDestination === diagonalDirectionLeft
   ) {
     return pawnLeftToKill;
   } else if (
     pawnRightToKill in waitingPlayerTools &&
-    waitingPlayerTools[pawnRightToKill].specialCases.movedByTwo &&
+    waitingPlayerSpecialInformation.pawnMovedTwiceNow === pawnRightToKill &&
     ColRowDestination === diagonalDirectionRight
   ) {
     return pawnRightToKill;
@@ -374,13 +290,7 @@ export const shouldKillPawnPassant = (
   }
 };
 
-export const killSetPiece = (pieceToKill, playerPieces) => {
-  let newPlayerPieces = { ...playerPieces };
-  delete newPlayerPieces[pieceToKill];
-  return newPlayerPieces;
-};
-
-export const moveSetPieceChangeName = (
+export const moveSetPieceToDestination = (
   colRowCurrent,
   colRowDestination,
   playerTools
@@ -404,20 +314,51 @@ export const killSetPieceAndAddToGraveyard = (
 
 export const changeSpecialInformation = (
   playerPieces,
-  playerSpecialInformation,
+  playersSpecialInformation,
+  currentPlayer,
+  waitingPlayer,
   colRowCurrent,
   colRowDestination
 ) => {
-  const newPlayerSpecialInformation = { ...playerSpecialInformation };
+  const specialInformation = { ...playersSpecialInformation };
+  let currentPlayerSpecialInformation = specialInformation[currentPlayer];
+  let waitingPlayerSpecialInformation = specialInformation[waitingPlayer];
+
   let [curCol, curRow] = colRowCurrent.split("_");
   let [destinationCol, destinationRow] = colRowDestination.split("_");
-  if (playerPieces[colRowCurrent].type === ChessTool.Pawn) {
-    newPlayerSpecialInformation.pawnMoved[ColsInBoard[curCol]] = true;
-    if (Math.abs(parseInt(curRow) - parseInt(destinationRow)) === 2) {
-      newPlayerSpecialInformation.pawnMovedTwiceNow = colRowDestination;
-    }
+  waitingPlayerSpecialInformation.pawnMovedTwiceNow = "";
+
+  switch (playerPieces[currentPlayer][colRowCurrent].type) {
+    case ChessTool.Pawn:
+      currentPlayerSpecialInformation.pawnMoved[
+        playerPieces[currentPlayer][colRowCurrent].id
+      ] = true;
+      currentPlayerSpecialInformation.pawnMovedTwiceNow = "";
+      if (
+        Math.abs(parseInt(curRow) - parseInt(destinationRow)) === 2 &&
+        curCol === destinationCol
+      ) {
+        currentPlayerSpecialInformation.pawnMovedTwiceNow = colRowDestination;
+      }
+      break;
+    case ChessTool.Rook:
+      if (curCol === "a") {
+        currentPlayerSpecialInformation.rookMoved.a = true;
+      } else if (curCol === "h") {
+        currentPlayerSpecialInformation.rookMoved.h = true;
+      }
+      break;
+    case ChessTool.King:
+      currentPlayerSpecialInformation.kingMoved = true;
+      break;
+    default:
+      break;
   }
-  return newPlayerSpecialInformation;
+  return {
+    ...playersSpecialInformation,
+    [currentPlayer]: currentPlayerSpecialInformation,
+    [waitingPlayer]: waitingPlayerSpecialInformation,
+  };
 };
 
 export const moveSetPiece = (
@@ -429,17 +370,15 @@ export const moveSetPiece = (
   colRowDestination,
   colRowToKill
 ) => {
-  let currentPlayerTools = playersTools[currentPlayer];
+  let currentPlayerTools = moveSetPieceToDestination(
+    colRowCurrent,
+    colRowDestination,
+    playersTools[currentPlayer]
+  );
   let waitingPlayerTools = playersTools[waitingPlayer];
   let waitingPlayerGraveyardTools = playerToolsGraveyard[waitingPlayer];
 
-  // const currentPlayerSpecialInformation = changeSpecialInformation(currentPlayerTools, playersSpecialInformation[currentPlayer], colRowCurrent, colRowDestination);
-  currentPlayerTools = moveSetPieceChangeName(
-    colRowCurrent,
-    colRowDestination,
-    currentPlayerTools
-  );
-
+  // in case of killing a piece, we need to remove it from the waiting player tools and add it to the graveyard of the waiting player.
   if (colRowToKill) {
     [waitingPlayerTools, waitingPlayerGraveyardTools] =
       killSetPieceAndAddToGraveyard(
@@ -448,18 +387,6 @@ export const moveSetPiece = (
         waitingPlayerGraveyardTools
       );
   }
-
-  // // handle special cases for the tool who played the game
-  // currentPlayerTools[colRowDestination] = {
-  //   ...currentPlayerTools[colRowDestination],
-  //   specialCases: toolSpecialInformation(
-  //     colRowCurrent,
-  //     colRowDestination,
-  //     currentPlayerTools[colRowDestination].type,
-  //     currentPlayerTools[colRowDestination].specialCases
-  //   ),
-  // };
-
   return {
     playersTools: {
       ...playersTools,
@@ -473,13 +400,51 @@ export const moveSetPiece = (
   };
 };
 
-export const getPossibleOptions = (myParams) => {
+export const moveSetPieceAndChangeSpecialInformation = (
+  playersTools,
+  playersSpecialInformation,
+  currentPlayer,
+  waitingPlayer,
+  playerToolsGraveyard,
+  colRowCurrent,
+  colRowDestination,
+  colRowToKill
+) => {
   const {
-    currentPlayerTools,
-    waitingPlayerTools,
-    currentPlayerSpecialInformation,
-    waitingPlayerSpecialInformation,
-  } = myParams;
+    playersTools: playerToolsToReturn,
+    playerToolsGraveyard: playerToolsGraveyardToReturn,
+  } = moveSetPiece(
+    playersTools,
+    currentPlayer,
+    waitingPlayer,
+    playerToolsGraveyard,
+    colRowCurrent,
+    colRowDestination,
+    colRowToKill
+  );
+
+  const playersSpecialInformationToReturn = changeSpecialInformation(
+    playersTools,
+    playersSpecialInformation,
+    currentPlayer,
+    waitingPlayer,
+    colRowCurrent,
+    colRowDestination
+  );
+
+  return {
+    playersTools: playerToolsToReturn,
+    playerToolsGraveyard: playerToolsGraveyardToReturn,
+    playersSpecialInformation: playersSpecialInformationToReturn,
+  };
+};
+
+export const getPossibleOptions = (
+  currentPlayerTools,
+  waitingPlayerTools,
+  currentPlayerSpecialInformation,
+  waitingPlayerSpecialInformation
+) => {
   const optionsCurrentPlayer = {};
   for (const [key, value] of Object.entries(currentPlayerTools)) {
     let [col, row] = key.split("_");
@@ -491,12 +456,13 @@ export const getPossibleOptions = (myParams) => {
       path: currentPlayerSpecialInformation.color,
       currentPlayerSpecialInformation: currentPlayerSpecialInformation,
       waitingPlayerSpecialInformation: waitingPlayerSpecialInformation,
+      id: value.id,
       row: correctRow,
       col: correctCol,
     };
     switch (value.type as any) {
       case ChessTool.Pawn:
-        optionsCurrentPlayer[key] = pawnPossiblePath(params);
+        optionsCurrentPlayer[key] = pawnPossibleMove(params);
         break;
       case ChessTool.Knight:
         optionsCurrentPlayer[key] = knightPossibleMove(params);
@@ -508,9 +474,8 @@ export const getPossibleOptions = (myParams) => {
         optionsCurrentPlayer[key] = bishopPossibleMove(params);
         break;
       case ChessTool.Queen:
-        optionsCurrentPlayer[key] = rookPossibleMove(params);
         optionsCurrentPlayer[key] = {
-          ...optionsCurrentPlayer[key],
+          ...rookPossibleMove(params),
           ...bishopPossibleMove(params),
         };
         break;
@@ -541,7 +506,9 @@ export const filterSelfCheckMove = (
         colRowCurrent,
         colRowDestination,
         playersTools[currentPlayer],
-        playersTools[waitingPlayer]
+        playersTools[waitingPlayer],
+        playersSpecialInformation[currentPlayer],
+        playersSpecialInformation[waitingPlayer]
       );
       let tooToKill: any = null;
       if (pawnToKill) {
@@ -550,8 +517,12 @@ export const filterSelfCheckMove = (
         tooToKill = colRowDestination;
       }
 
-      let { playersTools: updatedPlayerTools } = moveSetPiece(
+      let {
+        playersTools: updatedPlayerTools,
+        playersSpecialInformation: updatedPlayersSpecialInformation,
+      } = moveSetPieceAndChangeSpecialInformation(
         playersTools,
+        playersSpecialInformation,
         currentPlayer,
         waitingPlayer,
         playerToolsGraveyard,
@@ -561,14 +532,12 @@ export const filterSelfCheckMove = (
       );
 
       //possible options after the move
-      let possibleOpponentOptions = getPossibleOptions({
-        currentPlayerTools: updatedPlayerTools[waitingPlayer],
-        waitingPlayerTools: updatedPlayerTools[currentPlayer],
-        currentPlayerSpecialInformation:
-          playersSpecialInformation[currentPlayer],
-        waitingPlayerSpecialInformation:
-          playersSpecialInformation[waitingPlayer],
-      });
+      let possibleOpponentOptions = getPossibleOptions(
+        updatedPlayerTools[waitingPlayer],
+        updatedPlayerTools[currentPlayer],
+        updatedPlayersSpecialInformation[waitingPlayer],
+        updatedPlayersSpecialInformation[currentPlayer]
+      );
 
       if (
         !isKingInAttack(
