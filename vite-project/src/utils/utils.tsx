@@ -1,5 +1,12 @@
 import { ColsInBoard, colsInBoard } from "./constants";
 import { ChessTool, ChessColor } from "./types";
+import cloneDeep from "lodash.clonedeep";
+
+export const playSound = (sound) => {
+  const audio = new Audio(sound);
+  audio.play();
+  return audio;
+};
 
 const convertRowAndColToKey = (col: number, row: number) => {
   const colString = colsInBoard[col];
@@ -246,50 +253,6 @@ export const kingPossibleMove = (params) => {
   return paths;
 };
 
-//TODO: maybe delete this function
-export const shouldKillPawnPassant = (
-  colRowCurrent,
-  ColRowDestination,
-  currentPlayerTools,
-  waitingPlayerTools,
-  currentPlayerSpecialInformation,
-  waitingPlayerSpecialInformation
-) => {
-  let [col, row] = colRowCurrent.split("_");
-  col = ColsInBoard[col];
-  row = parseInt(row) - 1;
-
-  if (currentPlayerTools[colRowCurrent].type !== ChessTool.Pawn) {
-    return false;
-  }
-
-  const direction =
-    currentPlayerTools[colRowCurrent].path === ChessColor.White ? 1 : -1;
-
-  const diagonalDirectionLeft = convertRowAndColToKey(col - 1, row + direction);
-  const diagonalDirectionRight = convertRowAndColToKey(
-    col + 1,
-    row + direction
-  );
-  const pawnLeftToKill = convertRowAndColToKey(col - 1, row);
-  const pawnRightToKill = convertRowAndColToKey(col + 1, row);
-  if (
-    pawnLeftToKill in waitingPlayerTools &&
-    waitingPlayerSpecialInformation.pawnMovedTwiceNow === pawnLeftToKill &&
-    ColRowDestination === diagonalDirectionLeft
-  ) {
-    return pawnLeftToKill;
-  } else if (
-    pawnRightToKill in waitingPlayerTools &&
-    waitingPlayerSpecialInformation.pawnMovedTwiceNow === pawnRightToKill &&
-    ColRowDestination === diagonalDirectionRight
-  ) {
-    return pawnRightToKill;
-  } else {
-    return false;
-  }
-};
-
 export const moveSetPieceToDestination = (
   colRowCurrent,
   colRowDestination,
@@ -320,44 +283,42 @@ export const changeSpecialInformation = (
   colRowCurrent,
   colRowDestination
 ) => {
-  const specialInformation = { ...playersSpecialInformation };
-  let currentPlayerSpecialInformation = specialInformation[currentPlayer];
-  let waitingPlayerSpecialInformation = specialInformation[waitingPlayer];
+  const specialInformation = cloneDeep(playersSpecialInformation);
 
   let [curCol, curRow] = colRowCurrent.split("_");
   let [destinationCol, destinationRow] = colRowDestination.split("_");
-  waitingPlayerSpecialInformation.pawnMovedTwiceNow = "";
+  specialInformation[waitingPlayer].pawnMovedTwiceNow = "";
 
   switch (playerPieces[currentPlayer][colRowCurrent].type) {
     case ChessTool.Pawn:
-      currentPlayerSpecialInformation.pawnMoved[
+      specialInformation[currentPlayer].pawnMoved[
         playerPieces[currentPlayer][colRowCurrent].id
       ] = true;
-      currentPlayerSpecialInformation.pawnMovedTwiceNow = "";
+      specialInformation[currentPlayer].pawnMovedTwiceNow = "";
       if (
         Math.abs(parseInt(curRow) - parseInt(destinationRow)) === 2 &&
         curCol === destinationCol
       ) {
-        currentPlayerSpecialInformation.pawnMovedTwiceNow = colRowDestination;
+        specialInformation[currentPlayer].pawnMovedTwiceNow = colRowDestination;
       }
       break;
     case ChessTool.Rook:
       if (curCol === "a") {
-        currentPlayerSpecialInformation.rookMoved.a = true;
+        specialInformation[currentPlayer].rookMoved.a = true;
       } else if (curCol === "h") {
-        currentPlayerSpecialInformation.rookMoved.h = true;
+        specialInformation[currentPlayer].rookMoved.h = true;
       }
       break;
     case ChessTool.King:
-      currentPlayerSpecialInformation.kingMoved = true;
+      specialInformation[currentPlayer].kingMoved = true;
       break;
     default:
       break;
   }
   return {
     ...playersSpecialInformation,
-    [currentPlayer]: currentPlayerSpecialInformation,
-    [waitingPlayer]: waitingPlayerSpecialInformation,
+    [currentPlayer]: specialInformation[currentPlayer],
+    [waitingPlayer]: specialInformation[waitingPlayer],
   };
 };
 
@@ -494,6 +455,7 @@ export const filterSelfCheckMove = (
   waitingPlayer,
   playerToolsGraveyard,
   playersSpecialInformation,
+  isCurrentPlayerInCheck,
   possibleOptions
 ) => {
   const validMoves = {};
@@ -502,17 +464,13 @@ export const filterSelfCheckMove = (
     possibleOptions
   )) {
     for (const colRowDestination of Object.keys(colRowDestinations)) {
-      let pawnToKill = shouldKillPawnPassant(
-        colRowCurrent,
-        colRowDestination,
-        playersTools[currentPlayer],
-        playersTools[waitingPlayer],
-        playersSpecialInformation[currentPlayer],
-        playersSpecialInformation[waitingPlayer]
-      );
       let tooToKill: any = null;
-      if (pawnToKill) {
-        tooToKill = pawnToKill;
+      if (
+        playersTools[currentPlayer][colRowCurrent].type === ChessTool.Pawn &&
+        colRowCurrent.split("_")[0] !== colRowDestination.split("_")[0] &&
+        !(colRowDestination in playersTools[waitingPlayer])
+      ) {
+        tooToKill = playersSpecialInformation[waitingPlayer].pawnMovedTwiceNow;
       } else if (playersTools[waitingPlayer][colRowDestination]) {
         tooToKill = colRowDestination;
       }
@@ -522,7 +480,7 @@ export const filterSelfCheckMove = (
         playersSpecialInformation: updatedPlayersSpecialInformation,
       } = moveSetPieceAndChangeSpecialInformation(
         playersTools,
-        playersSpecialInformation,
+        { ...playersSpecialInformation },
         currentPlayer,
         waitingPlayer,
         playerToolsGraveyard,
@@ -545,7 +503,13 @@ export const filterSelfCheckMove = (
           updatedPlayerTools[currentPlayer]
         )
       ) {
-        if (colRowCurrent in validMoves) {
+        if (
+          playersTools[currentPlayer][colRowCurrent].type === ChessTool.King &&
+          isCurrentPlayerInCheck &&
+          ["c", "g"].includes(colRowDestination.split("_")[0])
+        ) {
+          continue;
+        } else if (colRowCurrent in validMoves) {
           validMoves[colRowCurrent] = {
             ...validMoves[colRowCurrent],
             [colRowDestination]: true,
@@ -574,4 +538,16 @@ export const isKingInAttack = (possibleOptions, currentPlayerTools) => {
     }
   }
   return false;
+};
+
+export const checkGameState = (possibleOptions, isCheck) => {
+  if (isCheck && Object.keys(possibleOptions).length === 0) {
+    return "checkmate";
+  } else if (Object.keys(possibleOptions).length === 0) {
+    return "tie";
+  } else if (isCheck) {
+    return "check";
+  } else {
+    return null;
+  }
 };

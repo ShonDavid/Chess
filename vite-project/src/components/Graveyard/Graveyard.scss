@@ -1,0 +1,26 @@
+.graveyard {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 100%;
+  &__top-pieces {
+    background-color: rgba($color: #ffffff, $alpha: 0.3);
+    height: 160px;
+    border-radius: 6px;
+    padding: 10px;
+  }
+
+  &__bottom-pieces {
+    margin-top: auto;
+    background-color: rgba($color: #ffffff, $alpha: 0.3);
+    height: 160px;
+    border-radius: 6px;
+    padding: 10px;
+  }
+
+  &__pieces-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}

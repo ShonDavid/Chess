@@ -1,11 +1,11 @@
-import { ColsInBoard } from "../utils/constants";
+import { ColsInBoard, sounds } from "../utils/constants";
 import { ChessTool } from "../utils/types";
 import {
+  checkGameState,
   filterSelfCheckMove,
   getPossibleOptions,
   isKingInAttack,
-  killSetPiece,
-  shouldKillPawnPassant,
+  playSound,
 } from "../utils/utils";
 import { ActionType } from "./ActionType";
 import { State } from "./AppContext";
@@ -91,6 +91,7 @@ export const onClickSquare: any =
         });
       }
 
+      playSound(sounds.move);
       // switch player turn after move
       return dispatch({
         type: ActionType.SWITCH_PLAYER_TURN,
@@ -98,7 +99,7 @@ export const onClickSquare: any =
     }
   };
 
-export const setPossibleOptions: any =
+export const getOptionsAndGameState: any =
   () => (dispatch: React.Dispatch<any>, getState: () => State) => {
     const {
       currentPlayer,
@@ -115,45 +116,39 @@ export const setPossibleOptions: any =
       playersSpecialInformation[waitingPlayer]
     );
 
-    // const optionsCurrentPlayerWithoutCheck = filterSelfCheckMove(
-    //   playersTools,
-    //   currentPlayer,
-    //   waitingPlayer,
-    //   playerToolsGraveyard,
-    //   playersSpecialInformation,
-    //   optionsCurrentPlayer
-    // );
-
-    return dispatch({
-      type: ActionType.SET_POSSIBLE_OPTIONS,
-      payload: optionsCurrentPlayer,
-    });
-  };
-
-export const setIsKingUnderAttack: any =
-  () => (dispatch: React.Dispatch<any>, getState: () => State) => {
-    const {
-      currentPlayer,
-      waitingPlayer,
-      playersTools,
-      possibleOptions,
-      playersSpecialInformation,
-    } = getState();
-    const optionsOpponentPlayer = getPossibleOptions(
+    const optionsWaitingPlayer = getPossibleOptions(
       playersTools[waitingPlayer],
       playersTools[currentPlayer],
       playersSpecialInformation[waitingPlayer],
-      playersSpecialInformation[currentPlayer],
+      playersSpecialInformation[currentPlayer]
     );
-    const isCheck = isKingInAttack(
-      optionsOpponentPlayer,
+
+    const isCurrentPlayerInCheck = isKingInAttack(
+      optionsWaitingPlayer,
       playersTools[currentPlayer]
     );
-    if (isCheck && Object.keys(possibleOptions).length === 0) {
-      console.log("Check Mate!");
-    } else if (Object.keys(possibleOptions).length === 0) {
-      console.log("Tie!");
-    } else if (isCheck) {
-      console.log("Check!");
+
+    const filteredPossibleOptions = filterSelfCheckMove(
+      playersTools,
+      currentPlayer,
+      waitingPlayer,
+      playerToolsGraveyard,
+      playersSpecialInformation,
+      isCurrentPlayerInCheck,
+      optionsCurrentPlayer
+    );
+
+    const gameState = checkGameState(
+      filteredPossibleOptions,
+      isCurrentPlayerInCheck
+    );
+
+    if (gameState === "checkmate") {
+      playSound(sounds.victory);
     }
+
+    return dispatch({
+      type: ActionType.SET_OPTIONS_AND_GAME_STATE,
+      payload: { possibleOptions: filteredPossibleOptions, gameState },
+    });
   };

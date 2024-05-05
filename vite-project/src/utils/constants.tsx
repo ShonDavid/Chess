@@ -1,4 +1,6 @@
 import { ChessTool, ChessColor } from "./types";
+import moveSound from "../assets/sounds/move.wav";
+import victorySound from "../assets/sounds/victory.mp3";
 
 export const firstPlayerTools = {
   a_2: {
@@ -198,14 +200,14 @@ export const blackPlayerSpecialInformation = {
   kingMoved: false,
   rookMoved: { a: false, h: false },
   pawnMoved: {
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
+    17: false,
+    18: false,
+    19: false,
+    20: false,
+    21: false,
+    22: false,
+    23: false,
+    24: false,
   },
   pawnMovedTwiceNow: "",
   color: ChessColor.Black,
@@ -224,3 +226,16 @@ export enum ColsInBoard {
   g = 6,
   h = 7,
 }
+
+export const chessToolGraveyardOrder = [
+  ChessTool.Pawn,
+  ChessTool.Knight,
+  ChessTool.Bishop,
+  ChessTool.Rook,
+  ChessTool.Queen,
+];
+
+export const sounds = {
+  move: moveSound,
+  victory: victorySound,
+};

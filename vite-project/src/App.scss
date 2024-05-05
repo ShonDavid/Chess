@@ -1,6 +1,22 @@
+$base-color: #c2c2c2;
+
 .app {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   padding-top: 30px;
+  height: 100%;
+}
+
+.board-container {
+  padding: 15px;
+  border-radius: 10px;
+  background: $base-color;
+}
+
+.graveyard-container {
+  margin-left: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  background: $base-color;
 }

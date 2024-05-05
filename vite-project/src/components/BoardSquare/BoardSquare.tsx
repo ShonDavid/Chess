@@ -22,9 +22,9 @@ const BoardSquare: FunctionComponent<BoardSquareType> = ({
 }) => {
   return (
     <div
-      className={`board-square ${isEven ? "board-square--even" : ""} ${
-        isChosen ? "board-square--chosen" : ""
-      }`}
+      className={`board-square ${
+        isEven ? "board-square--even" : "board-square--odd"
+      } ${isChosen ? "board-square--chosen" : ""}`}
       onClick={onClick}
     >
       {children}

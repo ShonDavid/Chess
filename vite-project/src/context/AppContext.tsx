@@ -7,9 +7,9 @@ import {
   secondPlayerTools,
   whitePlayerSpecialInformation,
 } from "../utils/constants";
-import { PlayerToolsType, PlayerTurn, PlayersToolsType } from "../utils/types";
+import { PlayerTurn, PlayersToolsType } from "../utils/types";
 import { ActionType } from "./ActionType";
-import { changeSpecialInformation, moveSetPiece, moveSetPieceAndChangeSpecialInformation } from "../utils/utils";
+import { moveSetPieceAndChangeSpecialInformation } from "../utils/utils";
 
 export type State = {
   counter: number;
@@ -23,6 +23,7 @@ export type State = {
   playerToolsGraveyard: any;
   toolToMove: string | null;
   chosenTool: string | null;
+  gameState: null | "check" | "tie" | "checkmate";
 };
 
 type Action = { type: ActionType; payload: any };
@@ -48,6 +49,7 @@ const initialState: State = {
   isOnTool: false,
   toolToMove: null,
   chosenTool: null,
+  gameState: null,
 };
 
 // to debug: console.log(action)
@@ -61,11 +63,11 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         chosenTool: payload,
       };
-    case ActionType.SET_POSSIBLE_OPTIONS:
-      console.log("playersSpecialInformation=", state.playersSpecialInformation);
+    case ActionType.SET_OPTIONS_AND_GAME_STATE:
       return {
         ...state,
-        possibleOptions: payload,
+        possibleOptions: payload.possibleOptions,
+        gameState: payload.gameState,
       };
     case ActionType.MOVE_AND_KILL_PLAYER_TOOL:
       stateChanges = moveSetPieceAndChangeSpecialInformation(
@@ -97,23 +99,7 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         ...stateChanges,
       };
-    case ActionType.MOVE_CASTLING_PLAYER_TOOL:
-      stateChanges = moveSetPieceAndChangeSpecialInformation(
-        state.playersTools,
-        state.playersSpecialInformation,
-        state.currentPlayer,
-        state.waitingPlayer,
-        state.playerToolsGraveyard,
-        state.chosenTool,
-        payload.kingDestination,
-        null
-      );
-      return {
-        ...state,
-        ...stateChanges,
-      };
     case ActionType.MOVE_PLAYER_TOOL:
-      console.log("playersSpecialInformation", state.playersSpecialInformation)
       stateChanges = moveSetPieceAndChangeSpecialInformation(
         state.playersTools,
         state.playersSpecialInformation,
@@ -124,7 +110,6 @@ const reducer = (state: State, action: Action): State => {
         payload.destination,
         null
       );
-      console.log("stateChanges", stateChanges);
       return {
         ...state,
         ...stateChanges,
@@ -160,9 +145,11 @@ const middleware = (
 ) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const dispatchWithMiddleware: React.Dispatch<Action> = (action: any) => {
+  const dispatchWithMiddleware: React.Dispatch<Action> = async (
+    action: any
+  ) => {
     if (typeof action === "function") {
-      action(dispatchWithMiddleware, () => state); // Pass getState function
+      await action(dispatchWithMiddleware, () => state); // Pass getState function
     } else {
       dispatch(action);
     }
