@@ -27,9 +27,12 @@
   }
 
   &__credits {
-    margin-left: auto;
-    padding-right: 16px;
+    padding: 0 16px;
     color: var(--textColor);
     font-size: 16px;
+  }
+
+  &__theme-toggle {
+    margin-left: auto;
   }
 }

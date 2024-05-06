@@ -16,6 +16,7 @@
 @import '../components/GameEndedModal/GameEndedModal.scss';
 @import '../components/PawnPromotionModal/PawnPromotionModal.scss';
 @import '../components/BoardWithPosition/BoardWithPosition.scss';
+@import '../components/Toggle/Toggle.scss';
 
 :export {
     textColor: var(--textColor);

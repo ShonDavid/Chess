@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import CloseIcon from "../../assets/icons/CloseIcon";
 import { useAppContext } from "../../context/AppContext";
-import { clearModal, closeModal } from "../../context/actions";
+import { closeModal } from "../../context/actions";
 
 const Modal: FunctionComponent = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,9 +15,8 @@ const Modal: FunctionComponent = () => {
   };
 
   useEffect(() => {
-    if (!isModalOpen) {
+   if (!isModalOpen) {
       setTimeout(() => {
-        dispatch(clearModal());
         setIsOpen(false);
       }, 500);
     } else {
