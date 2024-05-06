@@ -1,7 +1,7 @@
 .board {
   display: flex;
   flex-direction: column;
-  border: 1px solid #57677e;
+  border: 1px solid var(--chessBorderColor);
   border-radius: 4px;
   overflow: hidden;
 

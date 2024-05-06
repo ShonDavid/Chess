@@ -1,0 +1,42 @@
+.graveyard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background-color: var(--chessWhiteColor30Percent);
+    height: 160px;
+    border-radius: 6px;
+    padding: 10px;
+
+  &__ghost-background{
+    &--BLACK {
+      width: 140px;
+      position: absolute;
+
+      & svg {
+        & path {
+          fill: var(--chessBlackColor30Percent);
+        }
+      }
+    }
+
+    &--WHITE {
+      width: 140px;
+      position: absolute;
+      
+      & svg {
+        & path {
+          fill: var(--ghostWhiteColor);
+        }
+      }
+    }
+  }
+
+  &__pieces-container {
+    align-self: start;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}

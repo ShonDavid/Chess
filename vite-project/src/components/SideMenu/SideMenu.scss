@@ -1,0 +1,45 @@
+.side-menu {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: 100%;
+
+  &__buttons-menu{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  &__reset-button {
+    background-color: var(--buttonColor);
+    color: var(--buttonTextColor);
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 15px;
+
+    &:hover {
+      background-color: var(--buttonHoverColor);
+      color: var(--buttonTextColorHover);
+    }
+  }
+
+  &__player-turn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--chessWhiteColor30Percent);
+    color: var(--buttonTextColor);
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 15px;
+  }
+
+  &__bottom-graveyard {
+    margin-top: auto;
+  }
+}

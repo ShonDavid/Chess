@@ -1,0 +1,91 @@
+//light mode
+$light-main-color: #f5f5f5;
+$light-secondary-color: #ecdeb3;
+$light-tertiary-color: #dfd7bf;
+$light-quaternary-color: #69441d;
+$light-chess-white-color: #ffffff;
+$light-chess-black-color: #000000;
+$light-text-color: #000000;
+$light-text-color-hover: #ffffff;
+$light-chess-border-color: #000000;
+$light-secondary-60-color: lighten($light-secondary-color, 30%);
+$light-chess-white-30-color: rgba($light-chess-white-color, 0.3);
+$light-chess-black-30-color: rgba($light-chess-black-color, 0.3);
+
+
+//dark mode
+$dark-main-color: #070f2b;
+$dark-secondary-color: #1b1a55;
+$dark-tertiary-color: #535c91;
+$dark-quaternary-color: #9290c3;
+$dark-chess-white-color: #ffffff;
+$dark-chess-black-color: #000000;
+$dark-text-color: #ffffff;
+$dark-text-color-hover: #ffffff;
+$dark-chess-border-color: #000000;
+$dark-secondary-60-color: lighten($dark-secondary-color, 20%);
+$dark-chess-white-30-color: rgba($dark-chess-white-color, 0.3);
+$dark-chess-black-30-color: rgba($dark-chess-black-color, 0.3);
+
+//generic
+$modalBackgroundColor: rgba(0, 0, 0, 0.5);
+$modalBoxShadow: rgba(0, 0, 0, 0.1);
+
+html[data-theme="light"] {
+  --mainColor: #{$light-main-color};
+  --secondaryColor: #{$light-secondary-color};
+  --tertiaryColor: #{$light-tertiary-color};
+  --quaternaryColor: #{$light-quaternary-color};
+  --textColor: #{$light-text-color};
+  --textColorHover: #{$light-text-color-hover};
+
+  --chessWhiteColor: #{$light-chess-white-color};
+  --chessBlackColor: #{$light-chess-black-color};
+  --chessBorderColor: #{$light-chess-border-color};
+
+  --chessWhiteColor30Percent: #{$light-chess-white-30-color};
+  --chessBlackColor30Percent: #{$light-chess-black-30-color};
+  --secondary60Color: #{$light-secondary-60-color};
+  --ghostWhiteColor: #{$light-chess-white-color};
+}
+
+html[data-theme="dark"] {
+  --mainColor: #{$dark-main-color};
+  --secondaryColor: #{$dark-secondary-color};
+  --tertiaryColor: #{$dark-tertiary-color};
+  --quaternaryColor: #{$dark-quaternary-color};
+  --textColor: #{$dark-text-color};
+  --textColorHover: #{$dark-text-color-hover};
+
+  --chessWhiteColor: #{$dark-chess-white-color};
+  --chessBlackColor: #{$dark-chess-black-color};
+  --chessBorderColor: #{$dark-chess-border-color};
+
+  --chessWhiteColor30Percent: #{$dark-chess-white-30-color};
+  --chessBlackColor30Percent: #{$dark-chess-black-30-color};
+  --secondary60Color: #{$dark-secondary-60-color};
+  --ghostWhiteColor: #{$dark-chess-white-30-color};
+}
+
+:root {
+  --modalBackgroundColor: #{$modalBackgroundColor};
+  --modalBoxShadow: #{$modalBoxShadow};
+
+  --chessEvenTilesColor: var(--tertiaryColor);
+  --chessOddTilesColor: var(--quaternaryColor);
+  --backgroundComponentColor: var(--secondaryColor);
+  --backgroundColor: var(--mainColor);
+
+  //button
+  --buttonColor: var(--tertiaryColor);
+  --buttonHoverColor: var(--quaternaryColor);
+  --buttonTextColor: var(--textColor);
+  --buttonTextColorHover: var(--textColorHover);
+
+  //modal
+  --modalColor: var(--mainColor);
+
+  //piece choose
+  --chosenPieceColor: var(--secondary60Color);
+  --navigationPieceColor: var(--secondary60Color);
+}

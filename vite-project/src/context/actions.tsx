@@ -1,26 +1,36 @@
-import { rowsInBoard } from "../utils/constants";
+import GameEndedModal from "../components/GameEndedModal/GameEndedModal";
+import PawnPromotionModal from "../components/PawnPromotionModal/PawnPromotionModal";
+import { ColsInBoard, sounds } from "../utils/constants";
+import { ChessState, ChessTool } from "../utils/types";
 import {
-  ChessTool,
-  PawnPath,
-  PlayerToolsType,
-  SpecialInformation,
-} from "../utils/types";
-import {
+  checkGameState,
   filterSelfCheckMove,
   getPossibleOptions,
-  shouldKillPawnPassant,
+  isKingInAttack,
+  playSound,
 } from "../utils/utils";
 import { ActionType } from "./ActionType";
 import { State } from "./AppContext";
 
+export const pawnPromotion: any =
+  (promotionType: ChessTool) =>
+  (dispatch: React.Dispatch<any>, getState: () => State) => {
+    return dispatch({
+      type: ActionType.PAWN_PROMOTION,
+      payload: promotionType,
+    });
+  };
+
 export const onClickSquare: any =
-  (squareId) => (dispatch: React.Dispatch<any>, getState: () => State) => {
+  (squareId: string) =>
+  async (dispatch: React.Dispatch<any>, getState: () => State) => {
     const {
       currentPlayer,
       waitingPlayer,
       chosenTool,
       playersTools,
       possibleOptions,
+      playersSpecialInformation,
     } = getState();
 
     let isPossibleMove = !!(
@@ -34,51 +44,214 @@ export const onClickSquare: any =
         payload: squareId,
       });
     } else if (chosenTool && isPossibleMove) {
-      let pawnToKill = shouldKillPawnPassant(
-        chosenTool,
-        squareId,
-        playersTools[currentPlayer],
-        playersTools[waitingPlayer]
-      );
-      if (pawnToKill) {
+      // handle en passant
+      if (
+        playersTools[currentPlayer][chosenTool].type === ChessTool.Pawn &&
+        chosenTool.split("_")[0] !== squareId.split("_")[0] &&
+        !(squareId in playersTools[waitingPlayer])
+      ) {
         dispatch({
           type: ActionType.MOVE_EN_PASSANT_PLAYER_TOOL,
-          payload: { pawnToKill, pawnDestination: squareId },
+          payload: {
+            pawnToKill:
+              playersSpecialInformation[waitingPlayer].pawnMovedTwiceNow,
+            pawnDestination: squareId,
+          },
         });
-      } else if (playersTools[waitingPlayer][squareId]) {
-        dispatch({
-          type: ActionType.MOVE_AND_KILL_PLAYER_TOOL,
-          payload: squareId,
-        });
-      } else {
+
+        // handle promotion
+      } else if (
+        playersTools[currentPlayer][chosenTool].type === ChessTool.Pawn &&
+        (squareId.split("_")[1] === "1" || squareId.split("_")[1] === "8")
+      ) {
+        dispatch(moveAndKillPlayerTool(squareId));
+        playSound(sounds.move);
+        return dispatch(promotionOptionsModal(squareId));
+
+        // handle castling
+      } else if (
+        playersTools[currentPlayer][chosenTool].type === ChessTool.King &&
+        Math.abs(
+          parseInt(ColsInBoard[chosenTool.split("_")[0]]) -
+            parseInt(ColsInBoard[squareId.split("_")[0]])
+        ) > 1
+      ) {
+        //  move king
         dispatch({
           type: ActionType.MOVE_PLAYER_TOOL,
-          payload: squareId,
+          payload: { currentPosition: chosenTool, destination: squareId },
         });
+        // move rook
+        dispatch({
+          type: ActionType.MOVE_PLAYER_TOOL,
+          payload: {
+            currentPosition:
+              (squareId.split("_")[0] === "c" ? "a" : "h") +
+              "_" +
+              chosenTool.split("_")[1],
+            destination:
+              (squareId.split("_")[0] === "c" ? "d" : "f") +
+              "_" +
+              squareId.split("_")[1],
+          },
+        });
+      } else {
+        dispatch(moveAndKillPlayerTool(squareId));
       }
+
+      playSound(sounds.move);
+      // switch player turn after move
       return dispatch({
         type: ActionType.SWITCH_PLAYER_TURN,
       });
     }
   };
 
-export const setPossibleOptions: any =
+export const moveAndKillPlayerTool: any =
+  (squareId) => (dispatch: React.Dispatch<any>, getState: () => State) => {
+    const { waitingPlayer, chosenTool, playersTools } = getState();
+    if (playersTools[waitingPlayer][squareId]) {
+      dispatch({
+        type: ActionType.MOVE_AND_KILL_PLAYER_TOOL,
+        payload: {
+          currentPosition: chosenTool,
+          destination: squareId,
+          killSetPiece: squareId,
+        },
+      });
+    } else {
+      dispatch({
+        type: ActionType.MOVE_PLAYER_TOOL,
+        payload: { currentPosition: chosenTool, destination: squareId },
+      });
+    }
+  };
+
+export const getOptionsAndGameState: any =
   () => (dispatch: React.Dispatch<any>, getState: () => State) => {
-    const { currentPlayer, waitingPlayer, playersTools, playerToolsGraveyard } =
-      getState();
-    const optionsCurrentPlayer = getPossibleOptions({
-      currentPlayerTools: playersTools[currentPlayer],
-      waitingPlayerTools: playersTools[waitingPlayer],
-    });
-    const optionsCurrentPlayerWithoutCheck = filterSelfCheckMove(
+    const {
+      currentPlayer,
+      waitingPlayer,
+      playersTools,
+      playerToolsGraveyard,
+      playersSpecialInformation,
+    } = getState();
+
+    const optionsCurrentPlayer = getPossibleOptions(
+      playersTools[currentPlayer],
+      playersTools[waitingPlayer],
+      playersSpecialInformation[currentPlayer],
+      playersSpecialInformation[waitingPlayer]
+    );
+
+    const optionsWaitingPlayer = getPossibleOptions(
+      playersTools[waitingPlayer],
+      playersTools[currentPlayer],
+      playersSpecialInformation[waitingPlayer],
+      playersSpecialInformation[currentPlayer]
+    );
+
+    const isCurrentPlayerInCheck = isKingInAttack(
+      optionsWaitingPlayer,
+      playersTools[currentPlayer]
+    );
+
+    const filteredPossibleOptions = filterSelfCheckMove(
       playersTools,
       currentPlayer,
       waitingPlayer,
       playerToolsGraveyard,
+      playersSpecialInformation,
+      isCurrentPlayerInCheck,
       optionsCurrentPlayer
     );
+
+    const gameState = checkGameState(
+      filteredPossibleOptions,
+      isCurrentPlayerInCheck
+    );
+
+    if (gameState === ChessState.Checkmate) {
+      setTimeout(() => {
+        playSound(sounds.victory);
+        dispatch(openEndedGameModal("Checkmate!", `${waitingPlayer} wins!`));
+      }, 500);
+    }
+
+    if (gameState === ChessState.Tie) {
+      setTimeout(() => {
+        playSound(sounds.tie);
+        dispatch(openEndedGameModal("It's a Tie!"));
+      }, 500);
+    }
+
     return dispatch({
-      type: ActionType.SET_POSSIBLE_OPTIONS,
-      payload: optionsCurrentPlayerWithoutCheck,
+      type: ActionType.SET_OPTIONS_AND_GAME_STATE,
+      payload: { possibleOptions: filteredPossibleOptions, gameState },
+    });
+  };
+
+export const resetGame: any =
+  () => (dispatch: React.Dispatch<any>, getState: () => State) => {
+    return dispatch({
+      type: ActionType.RESET_GAME,
+    });
+  };
+
+export const onChoosePromotion: any =
+  (toolPromotion, pawnPosition) =>
+  (dispatch: React.Dispatch<any>, getState: () => State) => {
+    dispatch(closeModal());
+    dispatch({
+      type: ActionType.PAWN_PROMOTION,
+      payload: { pawnPosition, toolPromotion },
+    });
+    playSound(sounds.move);
+    return dispatch({
+      type: ActionType.SWITCH_PLAYER_TURN,
+    });
+  };
+
+export const closeModal: any =
+  () => (dispatch: React.Dispatch<any>, getState: () => State) => {
+    return dispatch({
+      type: ActionType.CLOSE_MODAL,
+    });
+  };
+
+export const clearModal: any =
+  () => (dispatch: React.Dispatch<any>, getState: () => State) => {
+    return dispatch({
+      type: ActionType.CLEAR_MODAL,
+    });
+  };
+
+export const openEndedGameModal: any = (text, secondaryText = "") => ({
+  type: ActionType.OPEN_MODAL,
+  payload: {
+    content: GameEndedModal,
+    props: {
+      text,
+      secondaryText,
+    },
+    showModalButton: true,
+  },
+});
+
+export const promotionOptionsModal: any =
+  (pawnPosition) => (dispatch: React.Dispatch<any>, getState: () => State) => {
+    const { currentPlayer } = getState();
+
+    return dispatch({
+      type: ActionType.OPEN_MODAL,
+      payload: {
+        content: PawnPromotionModal,
+        props: {
+          currentPlayer,
+          onClickPromotion: (pawnPromotion) =>
+            dispatch(onChoosePromotion(pawnPromotion, pawnPosition)),
+        },
+        showModalButton: false,
+      },
     });
   };

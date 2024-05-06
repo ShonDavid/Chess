@@ -1,0 +1,97 @@
+$mobileResolution: 599;
+$mainColor: #070f2b;
+$secondaryColor: #1b1a55;
+$tertiaryColor: #535c91;
+$quaternaryColor: #9290c3;
+$chessWhiteColor: #ffffff;
+$chessBlackColor: #000000;
+$textColor: #ffffff;
+$textColorHover: #ffffff;
+$chessBorderColor: #000000;
+$modalBackgroundColor: rgba(0, 0, 0, 0.5);
+$modalBoxShadow: rgba(0, 0, 0, 0.1);
+
+$chosenPieceColor: rgba(
+  $color: $secondaryColor,
+  $alpha: 0.6,
+);
+$navigationPieceColor: rgba(
+  $color: $secondaryColor,
+  $alpha: 0.6,
+);
+
+$chessWhiteColor30Percent: rgba(
+  $color: $chessWhiteColor,
+  $alpha: 0.3,
+);
+$chessBlackColor30Percent: rgba(
+  $color: $chessBlackColor,
+  $alpha: 0.3,
+);
+
+:root {
+  --mainColor: #{$mainColor};
+  --secondaryColor: #{$secondaryColor};
+  --tertiaryColor: #{$tertiaryColor};
+  --quaternaryColor: #{$quaternaryColor};
+  --chessWhiteColor: #{$chessWhiteColor};
+  --chessBlackColor: #{$chessBlackColor};
+  --textColor: #{$textColor};
+  --textColorHover: #{$textColorHover};
+  --chessBorderColor: #{$chessBorderColor};
+  --modalBackgroundColor: #{$modalBackgroundColor};
+  --modalBoxShadow: #{$modalBoxShadow};
+
+  --chessEvenTilesColor: var(--tertiaryColor);
+  --chessOddTilesColor: var(--quaternaryColor);
+  --backgroundComponentColor: var(--secondaryColor);
+  --backgroundColor: var(--mainColor);
+
+  //button
+  --buttonColor: var(--tertiaryColor);
+  --buttonHoverColor: var(--quaternaryColor);
+  --buttonTextColor: var(--textColor);
+  --buttonTextColorHover: var(--textColorHover);
+
+  //modal
+  --modalColor: var(--mainColor);
+
+  --chosenPieceColor: #{$chosenPieceColor};
+  --navigationPieceColor: #{$navigationPieceColor};
+
+  --chessWhiteColor30Percent: #{$chessWhiteColor30Percent};
+  --chessBlackColor30Percent: #{$chessBlackColor30Percent};
+}
+
+.light-theme {
+  $mainColor: #f5f5f5;
+  $chosenPieceColor: rgba(
+    $color: $mainColor,
+    $alpha: 0.8,
+  );
+  $navigationPieceColor: rgba(
+    $color: $mainColor,
+    $alpha: 0.8,
+  );
+  $chessWhiteColor30Percent: rgba(
+    $color: $chessWhiteColor,
+    $alpha: 0.6,
+  );
+
+  --mainColor: #f5f5f5;
+  --secondaryColor: #ecdeb3;
+  --tertiaryColor: #dfd7bf;
+  --quaternaryColor: #69441d;
+  --textColor: #000000;
+  --textColorHover: #ffffff;
+
+  --chosenPieceColor: #{$chosenPieceColor};
+  --navigationPieceColor: #{$navigationPieceColor};
+  --chessWhiteColor30Percent: #{$chessWhiteColor30Percent};
+}
+
+@mixin for-phone-only {
+  @media (max-width: ($mobileResolution + "px")) {
+    @content;
+  }
+}

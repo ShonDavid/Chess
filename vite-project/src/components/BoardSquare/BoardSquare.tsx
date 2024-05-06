@@ -1,5 +1,4 @@
 import React, { FunctionComponent, ReactNode } from "react";
-import "./BoardSquare.scss";
 
 type BoardSquareType = {
   row: string | number;
@@ -22,15 +21,15 @@ const BoardSquare: FunctionComponent<BoardSquareType> = ({
 }) => {
   return (
     <div
-      className={`board-square ${isEven ? "board-square--even" : ""} ${
-        isChosen ? "board-square--chosen" : ""
-      }`}
+      className={`board-square ${
+        isEven ? "board-square--even" : "board-square--odd"
+      } ${isChosen ? "board-square--chosen" : ""}`}
       onClick={onClick}
     >
       {children}
       {isChosen ? <div className="board-square__clicked" /> : null}
       {isPossibleMove ? <div className="board-square__possible" /> : null}
-      <div className="board-square__row-col">{row + " " + column}</div>
+      {/* <div className="board-square__row-col">{row + " " + column}</div> */}
     </div>
   );
 };

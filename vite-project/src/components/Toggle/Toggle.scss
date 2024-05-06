@@ -1,0 +1,57 @@
+$widthToggle: 60px;
+$heightToggle: 30px;
+
+.toggle {
+    display: flex;
+    align-items: center;
+    width: $widthToggle;
+    height: $heightToggle;
+    background-color: #FF9800;
+    border-radius: $heightToggle;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    overflow: hidden;
+
+    &--checked {
+        background-color: $dark-tertiary-color;
+    }
+
+    &__item, &__second-item{
+        position: absolute;
+        height: $heightToggle;
+        width: $heightToggle;
+        display: flex;
+        align-items: center;
+        z-index: 1;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+
+        &--checked {
+            opacity: 0;
+        }
+    }
+
+    &__item {
+        left: 0px;
+    }
+
+    &__second-item {
+        right: 0;
+    }
+
+    &__thumb {
+        width: calc($heightToggle - 2px);
+        height: calc($heightToggle - 2px);
+        background-color: #FFFFFF;
+        border-radius: 50%;
+        position: absolute;
+        left: 1px;
+        transition: all 0.3s ease; /* Animation for smooth movement */
+
+        &--checked {
+            left: calc(100% - $heightToggle + 1px);
+        }
+    }
+  }
+  

@@ -7,17 +7,26 @@
   height: 80px;
 
   &--even {
-    background-color: #adceff;
+    z-index: 0;
+    background-color: var(--chessEvenTilesColor);
+    width: 80px;
+    height: 80px;
+  }
+
+  &--odd {
+    z-index: 0;
+    background-color: var(--chessOddTilesColor);
     width: 80px;
     height: 80px;
   }
 
   &__clicked {
+    z-index: -1;
     position: absolute;
     border-radius: 6px;
     width: 90%;
     height: 90%;
-    background-color: rgba($color: #ffffff, $alpha: 0.4);
+    background-color: var(--navigationPieceColor);
   }
 
   &__possible {
@@ -25,7 +34,7 @@
     border-radius: 50%;
     width: 30%;
     height: 30%;
-    background-color: rgba($color: #ff0000, $alpha: 0.9);
+    background-color: var(--navigationPieceColor);
   }
 
   &__row-col {

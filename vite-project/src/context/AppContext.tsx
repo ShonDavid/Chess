@@ -1,25 +1,39 @@
 // AppContext.tsx
-import React, { createContext, useReducer, useContext, ReactNode } from "react";
-import { firstPlayerTools, secondPlayerTools } from "../utils/constants";
-import { PlayerToolsType, PlayerTurn, PlayersToolsType } from "../utils/types";
-import { ActionType } from "./ActionType";
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  ReactNode,
+  ReactElement,
+} from "react";
 import {
-  movePlayer,
-  removeAllMovedbyTwo,
-  toolSpecialInformation,
-} from "../utils/utils";
+  blackPlayerSpecialInformation,
+  firstPlayerPossibleOptions,
+  firstPlayerTools,
+  secondPlayerTools,
+  whitePlayerSpecialInformation,
+} from "../utils/constants";
+import { ChessColor, ChessState, PlayersToolsType } from "../utils/types";
+import { ActionType } from "./ActionType";
+import { moveSetPieceAndChangeSpecialInformation } from "../utils/utils";
 
 export type State = {
   counter: number;
   user: any;
-  currentPlayer: PlayerTurn;
-  waitingPlayer: PlayerTurn;
+  currentPlayer: ChessColor;
+  waitingPlayer: ChessColor;
   isOnTool: boolean;
   playersTools: PlayersToolsType;
+  playersSpecialInformation: any;
   possibleOptions: any;
   playerToolsGraveyard: any;
   toolToMove: string | null;
   chosenTool: string | null;
+  gameState: ChessState;
+  isModalOpen: boolean;
+  showModalButton: boolean;
+  modalProps: { [key: string]: any };
+  modalContent: any;
 };
 
 type Action = { type: ActionType; payload: any };
@@ -27,25 +41,35 @@ type Action = { type: ActionType; payload: any };
 const initialState: State = {
   counter: 0,
   user: null,
+  playersSpecialInformation: {
+    [ChessColor.White]: whitePlayerSpecialInformation,
+    [ChessColor.Black]: blackPlayerSpecialInformation,
+  },
   playersTools: {
-    [PlayerTurn.Player1]: firstPlayerTools,
-    [PlayerTurn.Player2]: secondPlayerTools,
+    [ChessColor.White]: firstPlayerTools,
+    [ChessColor.Black]: secondPlayerTools,
   },
   playerToolsGraveyard: {
-    [PlayerTurn.Player1]: [],
-    [PlayerTurn.Player2]: [],
+    [ChessColor.White]: [],
+    [ChessColor.Black]: [],
   },
-  possibleOptions: {},
-  currentPlayer: PlayerTurn.Player1,
-  waitingPlayer: PlayerTurn.Player2,
+  possibleOptions: firstPlayerPossibleOptions,
+  currentPlayer: ChessColor.White,
+  waitingPlayer: ChessColor.Black,
   isOnTool: false,
   toolToMove: null,
   chosenTool: null,
+  gameState: ChessState.Playing,
+  isModalOpen: false,
+  modalContent: null,
+  showModalButton: false,
+  modalProps: {},
 };
 
 // to debug: console.log(action)
 const reducer = (state: State, action: Action): State => {
   const { payload } = action;
+  console.log(action);
   let stateChanges;
   switch (action.type) {
     case ActionType.SET_CHOSEN_TOOL:
@@ -53,28 +77,31 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         chosenTool: payload,
       };
-    case ActionType.SET_POSSIBLE_OPTIONS:
+    case ActionType.SET_OPTIONS_AND_GAME_STATE:
       return {
         ...state,
-        possibleOptions: payload,
+        possibleOptions: payload.possibleOptions,
+        gameState: payload.gameState,
       };
     case ActionType.MOVE_AND_KILL_PLAYER_TOOL:
-      stateChanges = movePlayer(
+      stateChanges = moveSetPieceAndChangeSpecialInformation(
         state.playersTools,
+        state.playersSpecialInformation,
         state.currentPlayer,
         state.waitingPlayer,
         state.playerToolsGraveyard,
-        state.chosenTool,
-        payload,
-        payload
+        payload.currentPosition,
+        payload.destination,
+        payload.killSetPiece
       );
       return {
         ...state,
         ...stateChanges,
       };
     case ActionType.MOVE_EN_PASSANT_PLAYER_TOOL:
-      stateChanges = movePlayer(
+      stateChanges = moveSetPieceAndChangeSpecialInformation(
         state.playersTools,
+        state.playersSpecialInformation,
         state.currentPlayer,
         state.waitingPlayer,
         state.playerToolsGraveyard,
@@ -87,18 +114,34 @@ const reducer = (state: State, action: Action): State => {
         ...stateChanges,
       };
     case ActionType.MOVE_PLAYER_TOOL:
-      stateChanges = movePlayer(
+      stateChanges = moveSetPieceAndChangeSpecialInformation(
         state.playersTools,
+        state.playersSpecialInformation,
         state.currentPlayer,
         state.waitingPlayer,
         state.playerToolsGraveyard,
-        state.chosenTool,
-        payload,
+        payload.currentPosition,
+        payload.destination,
         null
       );
       return {
         ...state,
         ...stateChanges,
+      };
+    case ActionType.PAWN_PROMOTION:
+      return {
+        ...state,
+        playersTools: {
+          ...state.playersTools,
+          [state.currentPlayer]: {
+            ...state.playersTools[state.currentPlayer],
+            [payload.pawnPosition]: {
+              ...state.playersTools[state.currentPlayer][payload.pawnPosition],
+              type: payload.toolPromotion,
+            },
+          },
+        },
+        chosenTool: payload,
       };
     case ActionType.SWITCH_PLAYER_TURN:
       return {
@@ -106,6 +149,31 @@ const reducer = (state: State, action: Action): State => {
         currentPlayer: state.waitingPlayer,
         waitingPlayer: state.currentPlayer,
         chosenTool: null,
+      };
+    case ActionType.RESET_GAME:
+      return {
+        ...state,
+        ...initialState,
+      };
+    case ActionType.OPEN_MODAL:
+      return {
+        ...state,
+        isModalOpen: true,
+        modalContent: payload.content,
+        modalProps: payload.props,
+        showModalButton: payload.showModalButton,
+      };
+    case ActionType.CLOSE_MODAL:
+      return {
+        ...state,
+        isModalOpen: false,
+      };
+    case ActionType.CLEAR_MODAL:
+      return {
+        ...state,
+        modalContent: null,
+        modalProps: {},
+        showModalButton: false,
       };
     default:
       return state;
@@ -131,9 +199,11 @@ const middleware = (
 ) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const dispatchWithMiddleware: React.Dispatch<Action> = (action: any) => {
+  const dispatchWithMiddleware: React.Dispatch<Action> = async (
+    action: any
+  ) => {
     if (typeof action === "function") {
-      action(dispatchWithMiddleware, () => state); // Pass getState function
+      await action(dispatchWithMiddleware, () => state); // Pass getState function
     } else {
       dispatch(action);
     }

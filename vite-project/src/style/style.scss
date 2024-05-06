@@ -1,0 +1,23 @@
+//vars
+@import './variables';
+
+//general
+@import '../App.scss';
+
+//components
+@import '../components/Board/Board.scss';
+@import '../components/BoardSquare/BoardSquare.scss';
+@import '../components/Graveyard/Graveyard.scss';
+@import '../components/IconTool/IconTool.scss';
+@import '../components/NavigationBar/NavigationBar.scss';
+@import '../components/ChessPage/ChessPage.scss';
+@import '../components/SideMenu/SideMenu.scss';
+@import '../components/Modal/Modal.scss';
+@import '../components/GameEndedModal/GameEndedModal.scss';
+@import '../components/PawnPromotionModal/PawnPromotionModal.scss';
+@import '../components/BoardWithPosition/BoardWithPosition.scss';
+@import '../components/Toggle/Toggle.scss';
+
+:export {
+    textColor: var(--textColor);
+}

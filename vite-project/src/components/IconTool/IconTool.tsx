@@ -1,7 +1,6 @@
 import React from "react";
 import { ChessTool } from "../../utils/types";
 import Knight from "../../assets/icons/Knight";
-import "./IconTool.scss";
 import Bishop from "../../assets/icons/Bishop";
 import King from "../../assets/icons/King";
 import Pawn from "../../assets/icons/Pawn";
@@ -12,7 +11,7 @@ type IconToolProps = {
   name: ChessTool;
 };
 
-const IconTool = ({ name, fill = false }) => {
+const IconTool = ({ name, fill = false, size = "big" }) => {
   const iconByName = (name) => {
     switch (name) {
       case ChessTool.Bishop:
@@ -29,7 +28,7 @@ const IconTool = ({ name, fill = false }) => {
         return <Rook isFilled={fill} />;
     }
   };
-  return <div className="icon-tool">{iconByName(name)}</div>;
+  return <div className={`icon-tool--${size}`}>{iconByName(name)}</div>;
 };
 
 export default IconTool;
