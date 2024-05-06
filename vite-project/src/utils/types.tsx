@@ -1,16 +1,13 @@
-export enum PlayerTurn {
-  White = "WHITE",
-  Black = "BLACK",
-}
-
 export enum ChessColor {
   White = "WHITE",
   Black = "BLACK",
 }
 
-export enum SpecialInformation {
-  FirstTurn = "FIRST_TURN",
-  PawnTwiceMove = "PAWN_TWICE_MOVE",
+export enum ChessState {
+  Playing = "playing",
+  Check = "check",
+  Tie = "tie",
+  Checkmate = "checkmate",
 }
 
 export enum ChessTool {
@@ -30,5 +27,5 @@ export type PlayerToolsType = {
 };
 
 export type PlayersToolsType = {
-  [key in PlayerTurn]: PlayerToolsType;
+  [key in ChessColor]: PlayerToolsType;
 };

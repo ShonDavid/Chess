@@ -1,0 +1,30 @@
+.pawn-promotion-modal {
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+        color: var(--textColor);
+        font-size: 16px;
+    }
+
+    &__tools{
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+    }
+
+    &__tool-button {
+        background-color: var(--buttonColor);
+        color: var(--buttonTextColor);
+        border: none;
+        border-radius: 6px;
+        padding: 15px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 15px;
+    
+        &:hover {
+          background-color: var(--buttonHoverColor);
+        }
+      }
+}

@@ -1,0 +1,20 @@
+.chess-page {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding-top: 50px;
+    height: 100%;
+  }
+  
+  .chess-page__board-container {
+    padding: 15px;
+    border-radius: 10px;
+    background: var(--backgroundComponentColor);
+  }
+  
+  .chess-page__graveyard-container {
+    margin-left: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    background: var(--backgroundComponentColor);
+  }

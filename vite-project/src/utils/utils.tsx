@@ -1,5 +1,5 @@
 import { ColsInBoard, colsInBoard } from "./constants";
-import { ChessTool, ChessColor } from "./types";
+import { ChessTool, ChessColor, ChessState } from "./types";
 import cloneDeep from "lodash.clonedeep";
 
 export const playSound = (sound) => {
@@ -542,12 +542,12 @@ export const isKingInAttack = (possibleOptions, currentPlayerTools) => {
 
 export const checkGameState = (possibleOptions, isCheck) => {
   if (isCheck && Object.keys(possibleOptions).length === 0) {
-    return "checkmate";
+    return ChessState.Checkmate;
   } else if (Object.keys(possibleOptions).length === 0) {
-    return "tie";
+    return ChessState.Tie;
   } else if (isCheck) {
-    return "check";
+    return ChessState.Check;
   } else {
-    return null;
+    return ChessState.Playing;
   }
 };

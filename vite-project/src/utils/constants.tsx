@@ -1,6 +1,7 @@
 import { ChessTool, ChessColor } from "./types";
 import moveSound from "../assets/sounds/move.wav";
 import victorySound from "../assets/sounds/victory.mp3";
+import tieSound from "../assets/sounds/tie.mp3";
 
 export const firstPlayerTools = {
   a_2: {
@@ -235,7 +236,15 @@ export const chessToolGraveyardOrder = [
   ChessTool.Queen,
 ];
 
+export const chessToolPromotionPawn = [
+  ChessTool.Queen,
+  ChessTool.Rook,
+  ChessTool.Bishop,
+  ChessTool.Knight,
+]
+
 export const sounds = {
   move: moveSound,
   victory: victorySound,
+  tie: tieSound,
 };

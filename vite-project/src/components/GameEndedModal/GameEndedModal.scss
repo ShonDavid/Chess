@@ -1,0 +1,21 @@
+.game-ended-modal {
+    display: flex;
+    align-items: center;
+
+    &__text-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__text {
+        font-size: 24px;
+        color: var(--textColor);
+        margin-right: 40px;
+    }
+
+    &__secondary-text {
+        margin-top: 10px;
+        font-size: 18px;
+        color: var(--textColor);
+    }
+}

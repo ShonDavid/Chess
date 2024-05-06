@@ -1,0 +1,35 @@
+.navigation-bar {
+  display: flex;
+  align-items: center;
+  height: 60px;
+  width: 100%;
+  background-color: var(--backgroundComponentColor);
+
+  &__logo {
+    margin-left: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+
+    & svg {
+      & path {
+        fill: var(--textColor);
+      }
+    }
+  }
+
+  &__title {
+    padding-left: 16px;
+    color: var(--textColor);
+    font-size: 24px;
+  }
+
+  &__credits {
+    margin-left: auto;
+    padding-right: 16px;
+    color: var(--textColor);
+    font-size: 16px;
+  }
+}

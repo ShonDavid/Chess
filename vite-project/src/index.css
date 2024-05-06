@@ -2,11 +2,16 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
-* {
-  box-sizing: border-box;
+button, input[type="submit"], input[type="reset"] {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
 }
 
-body {
-  margin: 0;
-  background: rgb(255, 232, 232);
+* {
+  box-sizing: border-box;
 }

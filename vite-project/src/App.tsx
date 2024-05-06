@@ -1,17 +1,15 @@
-import React, { FunctionComponent } from "react";
-import Board from "./components/Board/Board";
-import "./App.scss";
-import Graveyard from "./components/Graveyard/Graveyard";
+import React, { FunctionComponent, useEffect } from "react";
+import "./style/style.scss";
+import NavigationBar from "./components/NavigationBar/NavigationBar";
+import ChessPage from "./components/ChessPage/ChessPage";
+import Modal from "./components/Modal/Modal";
 
 const App: FunctionComponent = () => {
   return (
     <div className="app">
-      <div className="board-container">
-        <Board />
-      </div>
-      <div className="graveyard-container">
-        <Graveyard />
-      </div>
+      <NavigationBar />
+      <ChessPage />
+      <Modal />
     </div>
   );
 };

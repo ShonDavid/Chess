@@ -1,5 +1,11 @@
 // AppContext.tsx
-import React, { createContext, useReducer, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  ReactNode,
+  ReactElement,
+} from "react";
 import {
   blackPlayerSpecialInformation,
   firstPlayerPossibleOptions,
@@ -7,15 +13,15 @@ import {
   secondPlayerTools,
   whitePlayerSpecialInformation,
 } from "../utils/constants";
-import { PlayerTurn, PlayersToolsType } from "../utils/types";
+import { ChessColor, ChessState, PlayersToolsType } from "../utils/types";
 import { ActionType } from "./ActionType";
 import { moveSetPieceAndChangeSpecialInformation } from "../utils/utils";
 
 export type State = {
   counter: number;
   user: any;
-  currentPlayer: PlayerTurn;
-  waitingPlayer: PlayerTurn;
+  currentPlayer: ChessColor;
+  waitingPlayer: ChessColor;
   isOnTool: boolean;
   playersTools: PlayersToolsType;
   playersSpecialInformation: any;
@@ -23,7 +29,11 @@ export type State = {
   playerToolsGraveyard: any;
   toolToMove: string | null;
   chosenTool: string | null;
-  gameState: null | "check" | "tie" | "checkmate";
+  gameState: ChessState;
+  isModalOpen: boolean;
+  showModalButton: boolean;
+  modalProps: { [key: string]: any };
+  modalContent: any;
 };
 
 type Action = { type: ActionType; payload: any };
@@ -32,24 +42,28 @@ const initialState: State = {
   counter: 0,
   user: null,
   playersSpecialInformation: {
-    [PlayerTurn.White]: whitePlayerSpecialInformation,
-    [PlayerTurn.Black]: blackPlayerSpecialInformation,
+    [ChessColor.White]: whitePlayerSpecialInformation,
+    [ChessColor.Black]: blackPlayerSpecialInformation,
   },
   playersTools: {
-    [PlayerTurn.White]: firstPlayerTools,
-    [PlayerTurn.Black]: secondPlayerTools,
+    [ChessColor.White]: firstPlayerTools,
+    [ChessColor.Black]: secondPlayerTools,
   },
   playerToolsGraveyard: {
-    [PlayerTurn.White]: [],
-    [PlayerTurn.Black]: [],
+    [ChessColor.White]: [],
+    [ChessColor.Black]: [],
   },
   possibleOptions: firstPlayerPossibleOptions,
-  currentPlayer: PlayerTurn.White,
-  waitingPlayer: PlayerTurn.Black,
+  currentPlayer: ChessColor.White,
+  waitingPlayer: ChessColor.Black,
   isOnTool: false,
   toolToMove: null,
   chosenTool: null,
-  gameState: null,
+  gameState: ChessState.Playing,
+  isModalOpen: false,
+  modalContent: null,
+  showModalButton: false,
+  modalProps: {},
 };
 
 // to debug: console.log(action)
@@ -114,12 +128,52 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         ...stateChanges,
       };
+    case ActionType.PAWN_PROMOTION:
+      return {
+        ...state,
+        playersTools: {
+          ...state.playersTools,
+          [state.currentPlayer]: {
+            ...state.playersTools[state.currentPlayer],
+            [payload.pawnPosition]: {
+              ...state.playersTools[state.currentPlayer][payload.pawnPosition],
+              type: payload.toolPromotion,
+            },
+          },
+        },
+        chosenTool: payload,
+      };
     case ActionType.SWITCH_PLAYER_TURN:
       return {
         ...state,
         currentPlayer: state.waitingPlayer,
         waitingPlayer: state.currentPlayer,
         chosenTool: null,
+      };
+    case ActionType.RESET_GAME:
+      return {
+        ...state,
+        ...initialState,
+      };
+    case ActionType.OPEN_MODAL:
+      return {
+        ...state,
+        isModalOpen: true,
+        modalContent: payload.content,
+        modalProps: payload.props,
+        showModalButton: payload.showModalButton,
+      };
+    case ActionType.CLOSE_MODAL:
+      return {
+        ...state,
+        isModalOpen: false,
+      };
+    case ActionType.CLEAR_MODAL:
+      return {
+        ...state,
+        modalContent: null,
+        modalProps: {},
+        showModalButton: false,
       };
     default:
       return state;

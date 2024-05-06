@@ -1,7 +1,6 @@
 import React from "react";
 import { ChessTool } from "../../utils/types";
 import Knight from "../../assets/icons/Knight";
-import "./IconTool.scss";
 import Bishop from "../../assets/icons/Bishop";
 import King from "../../assets/icons/King";
 import Pawn from "../../assets/icons/Pawn";

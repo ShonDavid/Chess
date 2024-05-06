@@ -3,21 +3,14 @@ import { useAppContext } from "../../context/AppContext";
 import { chessBoard, colsInBoard } from "../../utils/constants";
 import BoardSquare from "../BoardSquare/BoardSquare";
 import { getOptionsAndGameState, onClickSquare } from "../../context/actions";
-import { PlayerTurn } from "../../utils/types";
-import "./Board.scss";
+import { ChessColor } from "../../utils/types";
 import IconTool from "../IconTool/IconTool";
 
 const Board = () => {
   const { state, dispatch } = useAppContext();
   const isMountingRef = useRef(true);
 
-  const {
-    playersTools,
-    currentPlayer,
-    possibleOptions,
-    chosenTool,
-    gameState,
-  } = state;
+  const { playersTools, currentPlayer, possibleOptions, chosenTool } = state;
 
   useEffect(() => {
     if (!isMountingRef.current) {
@@ -28,7 +21,7 @@ const Board = () => {
   }, [currentPlayer]);
 
   return (
-    <div className="board" key="lol">
+    <div className="board" key="board-chess">
       {chessBoard.map((col, colIndex) => (
         <div className="board__col" key={colIndex}>
           {col.map((_, rowIndex) => {
@@ -50,14 +43,14 @@ const Board = () => {
                 onClick={() => dispatch(onClickSquare(colRow))}
                 isPossibleMove={isPossibleMove}
               >
-                {colRow in playersTools[PlayerTurn.White] ? (
+                {colRow in playersTools[ChessColor.White] ? (
                   <IconTool
-                    name={playersTools[PlayerTurn.White][colRow].type}
+                    name={playersTools[ChessColor.White][colRow].type}
                   />
                 ) : null}
-                {colRow in playersTools[PlayerTurn.Black] ? (
+                {colRow in playersTools[ChessColor.Black] ? (
                   <IconTool
-                    name={playersTools[PlayerTurn.Black][colRow].type}
+                    name={playersTools[ChessColor.Black][colRow].type}
                     fill={true}
                   />
                 ) : null}
