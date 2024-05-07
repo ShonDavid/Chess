@@ -7,6 +7,7 @@ import GraveyardPieces from "../Graveyard/GraveyardPieces";
 const ChessPage = () => {
   return (
     <div className="chess-page">
+      <div className="chess-page__board-graveyard-container">
       <div className="chess-page__board-container">
         <div className="chess-page__graveyard-for-mobile">
           <GraveyardPieces color={ChessColor.Black} />
@@ -18,6 +19,7 @@ const ChessPage = () => {
       </div>
       <div className="chess-page__graveyard-container">
         <SideMenu />
+      </div>
       </div>
     </div>
   );
