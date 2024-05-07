@@ -1,15 +1,51 @@
 .chess-page {
     display: flex;
-    align-items: stretch;
     justify-content: center;
     padding-top: 50px;
+    width: 100%;
     height: 100%;
+    @include for-small-desktop {
+      padding: 30px 10px 0 10px;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    &__graveyard-for-mobile{
+      display: none;
+      @include for-small-desktop {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 15px;
+        margin-bottom: 5px;
+        min-height: 40px;
+        width: calc(100% - 15px);
+        border-radius: 4px;
+        background: var(--chessWhiteColor30Percent);
+        padding: 5px;
+
+        &:last-child {
+          margin-top: 5px;
+          margin-bottom: 0;
+        }
+      }
+    }
+
   }
   
   .chess-page__board-container {
     padding: 15px;
     border-radius: 10px;
     background: var(--backgroundComponentColor);
+    width: 700px;
+
+    @include for-small-desktop {
+      width: 600px;
+    }
+
+    @include for-phone-only {
+      width: 100%;
+    }
   }
   
   .chess-page__graveyard-container {
@@ -17,4 +53,7 @@
     padding: 15px;
     border-radius: 10px;
     background: var(--backgroundComponentColor);
+    @include for-small-desktop {
+      display: none;
+    }
   }

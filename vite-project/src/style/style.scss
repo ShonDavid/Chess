@@ -1,5 +1,6 @@
 //vars
 @import './variables';
+@import './mixins';
 
 //general
 @import '../App.scss';
@@ -17,6 +18,7 @@
 @import '../components/PawnPromotionModal/PawnPromotionModal.scss';
 @import '../components/BoardWithPosition/BoardWithPosition.scss';
 @import '../components/Toggle/Toggle.scss';
+@import '../components/Credits/Credits.scss';
 
 :export {
     textColor: var(--textColor);

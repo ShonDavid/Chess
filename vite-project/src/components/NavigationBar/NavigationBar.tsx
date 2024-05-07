@@ -14,9 +14,6 @@ const NavigationBar = () => {
       <div className="navigation-bar__theme-toggle">
         <Toggle />
       </div>
-      <div className="navigation-bar__credits">
-        Developed by <b>Shon David </b>
-      </div>
     </div>
   );
 };

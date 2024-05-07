@@ -4,9 +4,9 @@
   height: 60px;
   width: 100%;
   background-color: var(--backgroundComponentColor);
+  padding: 0 10px;
 
   &__logo {
-    margin-left: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -24,12 +24,6 @@
     padding-left: 16px;
     color: var(--textColor);
     font-size: 24px;
-  }
-
-  &__credits {
-    padding: 0 16px;
-    color: var(--textColor);
-    font-size: 16px;
   }
 
   &__theme-toggle {

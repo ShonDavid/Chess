@@ -1,0 +1,15 @@
+.credits {
+    display: flex;
+    margin-top: auto;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    width: 100%;
+    background-color: var(--backgroundComponentColor);
+
+    &__text {
+        padding: 0 16px;
+        color: var(--textColor);
+        font-size: 16px;
+      }
+}

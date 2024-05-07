@@ -14,14 +14,15 @@
         display: flex;
         justify-content: end;
         padding-top: 5px;
+        padding-left: 15px;
         width: 100%;
     }
 
     &__rows {
         display: flex;
-        padding-right: 5px;
         flex-direction: column;
-        height: 100%;
+        width: 15px;
+        padding-right: 5px;
     }
 
     &__row {
@@ -29,7 +30,7 @@
         align-items: center;
         justify-content: center;
         color: var(--textColor);
-        height: 80px;
+        height: 12.5%;
     }
 
     &__column {
@@ -37,6 +38,6 @@
         align-items: center;
         justify-content: center;
         color: var(--textColor);
-        width: 80px;
+        width: 12.5%;
     }
 }

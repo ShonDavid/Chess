@@ -6,35 +6,13 @@ import { resetGame } from "../../context/actions";
 
 const SideMenu = () => {
   const {
-    state: { gameState, currentPlayer, waitingPlayer, playerToolsGraveyard },
+    state: { gameState, currentPlayer, waitingPlayer },
     dispatch,
   } = useAppContext();
 
-  const graveyardCounter = useMemo(() => {
-    let graveyardToReturn = {};
-    Object.keys(playerToolsGraveyard).map(
-      (key) =>
-        (graveyardToReturn[key] = playerToolsGraveyard[key].reduce(
-          (groups, item) => {
-            const { type } = item;
-            if (!groups[type]) {
-              groups[type] = [];
-            }
-            groups[type].push(item);
-            return groups;
-          },
-          {}
-        ))
-    );
-    return graveyardToReturn;
-  }, [playerToolsGraveyard]);
-
   return (
     <div className="side-menu">
-      <Graveyard
-        color={ChessColor.Black}
-        tools={graveyardCounter[ChessColor.Black]}
-      />
+      <Graveyard color={ChessColor.Black} />
       <div className="side-menu__buttons-menu">
         <button
           onClick={() => dispatch(resetGame())}
@@ -46,14 +24,13 @@ const SideMenu = () => {
           Player Turn: {currentPlayer}
         </div>
         <div className="side-menu__player-turn">
-          {gameState === ChessState.Checkmate? `Checkmate! ${waitingPlayer} Won!`: `Game State: ${gameState}`}
+          {gameState === ChessState.Checkmate
+            ? `Checkmate! ${waitingPlayer} Won!`
+            : `Game State: ${gameState}`}
         </div>
       </div>
       <div className="side-menu__bottom-graveyard">
-        <Graveyard
-          color={ChessColor.White}
-          tools={graveyardCounter[ChessColor.White]}
-        />
+        <Graveyard color={ChessColor.White} />
       </div>
     </div>
   );

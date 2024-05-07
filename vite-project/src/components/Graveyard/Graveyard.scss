@@ -38,5 +38,9 @@
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+
+    @include for-small-desktop {
+      align-self: center;
+    }
   }
 }

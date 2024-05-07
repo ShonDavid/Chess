@@ -22,9 +22,9 @@ const Board = () => {
 
   return (
     <div className="board" key="board-chess">
-      {chessBoard.map((col, colIndex) => (
-        <div className="board__col" key={colIndex}>
-          {col.map((_, rowIndex) => {
+      <div className="board-content" key="board-chess">
+        {chessBoard.map((col, colIndex) =>
+          col.map((_, rowIndex) => {
             let columnBoard = colsInBoard[rowIndex];
             let rowBoard = 8 - colIndex;
             let colRow = `${columnBoard}_${rowBoard}`;
@@ -56,9 +56,9 @@ const Board = () => {
                 ) : null}
               </BoardSquare>
             );
-          })}
-        </div>
-      ))}
+          })
+        )}
+      </div>
     </div>
   );
 };
