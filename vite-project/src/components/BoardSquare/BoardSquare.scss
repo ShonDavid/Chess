@@ -3,21 +3,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  overflow: hidden;
 
   &--even {
     z-index: 0;
     background-color: var(--chessEvenTilesColor);
-    width: 80px;
-    height: 80px;
   }
 
   &--odd {
     z-index: 0;
     background-color: var(--chessOddTilesColor);
-    width: 80px;
-    height: 80px;
   }
 
   &__clicked {
@@ -37,6 +32,8 @@
     background-color: var(--navigationPieceColor);
   }
 
+
+  //redundant code - for col row inside the square
   &__row-col {
     position: absolute;
     height: 100%;
