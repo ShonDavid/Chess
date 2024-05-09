@@ -11,7 +11,7 @@ $light-chess-border-color: #000000;
 $light-secondary-60-color: lighten($light-secondary-color, 30%);
 $light-chess-white-30-color: rgba($light-chess-white-color, 0.3);
 $light-chess-black-30-color: rgba($light-chess-black-color, 0.3);
-
+$light-background-image: url("../assets/images/background-light.svg");
 
 //dark mode
 $dark-main-color: #070f2b;
@@ -26,6 +26,7 @@ $dark-chess-border-color: #000000;
 $dark-secondary-60-color: lighten($dark-secondary-color, 20%);
 $dark-chess-white-30-color: rgba($dark-chess-white-color, 0.3);
 $dark-chess-black-30-color: rgba($dark-chess-black-color, 0.3);
+$dark-background-image: url("../assets/images/background-dark.svg");
 
 //generic
 $modalBackgroundColor: rgba(0, 0, 0, 0.5);
@@ -47,6 +48,7 @@ html[data-theme="light"] {
   --chessBlackColor30Percent: #{$light-chess-black-30-color};
   --secondary60Color: #{$light-secondary-60-color};
   --ghostWhiteColor: #{$light-chess-white-color};
+  --backgroundImage: #{$light-background-image};
 }
 
 html[data-theme="dark"] {
@@ -65,6 +67,7 @@ html[data-theme="dark"] {
   --chessBlackColor30Percent: #{$dark-chess-black-30-color};
   --secondary60Color: #{$dark-secondary-60-color};
   --ghostWhiteColor: #{$dark-chess-white-30-color};
+  --backgroundImage: #{$dark-background-image};
 }
 
 :root {

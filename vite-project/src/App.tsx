@@ -8,6 +8,7 @@ import Credits from "./components/Credits/Credits";
 const App: FunctionComponent = () => {
   return (
     <div className="app">
+      <div className="app__background" />
       <NavigationBar />
       <ChessPage />
       <Modal />
