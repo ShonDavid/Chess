@@ -12,12 +12,106 @@ import {
 import { ActionType } from "./ActionType";
 import { State } from "./AppContext";
 
-export const pawnPromotion: any =
-  (promotionType: ChessTool) =>
+export const addToPlayHistory: any =
+  (type, destination, caseOfPlay) =>
   (dispatch: React.Dispatch<any>, getState: () => State) => {
     return dispatch({
-      type: ActionType.PAWN_PROMOTION,
-      payload: promotionType,
+      type: ActionType.ADD_TO_PLAY_HISTORY,
+      payload: params,
+    });
+  };
+
+export const makeToolMove: any =
+  (squareId: ChessTool) =>
+  (dispatch: React.Dispatch<any>, getState: () => State) => {
+    const { chosenTool, currentPlayer, playersTools } = getState();
+    dispatch({
+      type: ActionType.MOVE_PLAYER_TOOL,
+      payload: { currentPosition: chosenTool, destination: squareId },
+    });
+    dispatch(
+      addToPlayHistory(playersTools[currentPlayer][squareId], destination)
+    );
+    return dispatch({
+      type: ActionType.SWITCH_PLAYER_TURN,
+    });
+  };
+
+export const makeToolKillAndMove: any =
+  (squareId: ChessTool) =>
+  (dispatch: React.Dispatch<any>, getState: () => State) => {
+    const { chosenTool } = getState();
+    dispatch({
+      type: ActionType.MOVE_AND_KILL_PLAYER_TOOL,
+      payload: {
+        currentPosition: chosenTool,
+        destination: squareId,
+        killSetPiece: squareId,
+      },
+    });
+    return dispatch({
+      type: ActionType.SWITCH_PLAYER_TURN,
+    });
+  };
+
+export const makeEnPassantMove: any =
+  (squareId) => (dispatch: React.Dispatch<any>, getState: () => State) => {
+    const { waitingPlayer, playersSpecialInformation } = getState();
+
+    dispatch({
+      type: ActionType.MOVE_EN_PASSANT_PLAYER_TOOL,
+      payload: {
+        pawnToKill: playersSpecialInformation[waitingPlayer].pawnMovedTwiceNow,
+        pawnDestination: squareId,
+      },
+    });
+    return dispatch({
+      type: ActionType.SWITCH_PLAYER_TURN,
+    });
+  };
+
+export const makePromotionMove: any =
+  (squareId) => (dispatch: React.Dispatch<any>, getState: () => State) => {
+    const { waitingPlayer, chosenTool, playersTools } = getState();
+    if (playersTools[waitingPlayer][squareId]) {
+      dispatch({
+        type: ActionType.MOVE_AND_KILL_PLAYER_TOOL,
+        payload: {
+          currentPosition: chosenTool,
+          destination: squareId,
+          killSetPiece: squareId,
+        },
+      });
+    } else {
+      dispatch({
+        type: ActionType.MOVE_PLAYER_TOOL,
+        payload: { currentPosition: chosenTool, destination: squareId },
+      });
+    }
+    return dispatch(promotionOptionsModal(squareId));
+  };
+
+export const makeCastleMove: any =
+  (squareId) => (dispatch: React.Dispatch<any>, getState: () => State) => {
+    const { chosenTool } = getState();
+    //  move king
+    dispatch({
+      type: ActionType.MOVE_PLAYER_TOOL,
+      payload: { currentPosition: chosenTool, destination: squareId },
+    });
+    // move rook
+    dispatch({
+      type: ActionType.MOVE_PLAYER_TOOL,
+      payload: {
+        currentPosition:
+          (squareId.split("_")[0] === "c" ? "a" : "h") +
+          "_" +
+          chosenTool?.split("_")[1],
+        destination:
+          (squareId.split("_")[0] === "c" ? "d" : "f") +
+          "_" +
+          squareId.split("_")[1],
+      },
     });
   };
 
@@ -30,7 +124,6 @@ export const onClickSquare: any =
       chosenTool,
       playersTools,
       possibleOptions,
-      playersSpecialInformation,
     } = getState();
 
     let isPossibleMove = !!(
@@ -50,23 +143,14 @@ export const onClickSquare: any =
         chosenTool.split("_")[0] !== squareId.split("_")[0] &&
         !(squareId in playersTools[waitingPlayer])
       ) {
-        dispatch({
-          type: ActionType.MOVE_EN_PASSANT_PLAYER_TOOL,
-          payload: {
-            pawnToKill:
-              playersSpecialInformation[waitingPlayer].pawnMovedTwiceNow,
-            pawnDestination: squareId,
-          },
-        });
+        dispatch(makeEnPassantMove(squareId));
 
         // handle promotion
       } else if (
         playersTools[currentPlayer][chosenTool].type === ChessTool.Pawn &&
         (squareId.split("_")[1] === "1" || squareId.split("_")[1] === "8")
       ) {
-        dispatch(moveAndKillPlayerTool(squareId));
-        playSound(sounds.move);
-        return dispatch(promotionOptionsModal(squareId));
+        return dispatch(makePromotionMove(squareId));
 
         // handle castling
       } else if (
@@ -76,54 +160,12 @@ export const onClickSquare: any =
             parseInt(ColsInBoard[squareId.split("_")[0]])
         ) > 1
       ) {
-        //  move king
-        dispatch({
-          type: ActionType.MOVE_PLAYER_TOOL,
-          payload: { currentPosition: chosenTool, destination: squareId },
-        });
-        // move rook
-        dispatch({
-          type: ActionType.MOVE_PLAYER_TOOL,
-          payload: {
-            currentPosition:
-              (squareId.split("_")[0] === "c" ? "a" : "h") +
-              "_" +
-              chosenTool.split("_")[1],
-            destination:
-              (squareId.split("_")[0] === "c" ? "d" : "f") +
-              "_" +
-              squareId.split("_")[1],
-          },
-        });
+        return dispatch(makeCastleMove(squareId));
+      } else if (playersTools[waitingPlayer][squareId]) {
+        return dispatch(makeToolKillAndMove(squareId));
       } else {
-        dispatch(moveAndKillPlayerTool(squareId));
+        return dispatch(makeToolMove(squareId));
       }
-
-      playSound(sounds.move);
-      // switch player turn after move
-      return dispatch({
-        type: ActionType.SWITCH_PLAYER_TURN,
-      });
-    }
-  };
-
-export const moveAndKillPlayerTool: any =
-  (squareId) => (dispatch: React.Dispatch<any>, getState: () => State) => {
-    const { waitingPlayer, chosenTool, playersTools } = getState();
-    if (playersTools[waitingPlayer][squareId]) {
-      dispatch({
-        type: ActionType.MOVE_AND_KILL_PLAYER_TOOL,
-        payload: {
-          currentPosition: chosenTool,
-          destination: squareId,
-          killSetPiece: squareId,
-        },
-      });
-    } else {
-      dispatch({
-        type: ActionType.MOVE_PLAYER_TOOL,
-        payload: { currentPosition: chosenTool, destination: squareId },
-      });
     }
   };
 
@@ -198,20 +240,6 @@ export const resetGame: any =
     });
   };
 
-export const onChoosePromotion: any =
-  (toolPromotion, pawnPosition) =>
-  (dispatch: React.Dispatch<any>, getState: () => State) => {
-    dispatch(closeModal());
-    dispatch({
-      type: ActionType.PAWN_PROMOTION,
-      payload: { pawnPosition, toolPromotion },
-    });
-    playSound(sounds.move);
-    return dispatch({
-      type: ActionType.SWITCH_PLAYER_TURN,
-    });
-  };
-
 export const closeModal: any =
   () => (dispatch: React.Dispatch<any>, getState: () => State) => {
     return dispatch({
@@ -253,5 +281,19 @@ export const promotionOptionsModal: any =
         },
         showModalButton: false,
       },
+    });
+  };
+
+export const onChoosePromotion: any =
+  (toolPromotion, pawnPosition) =>
+  (dispatch: React.Dispatch<any>, getState: () => State) => {
+    dispatch(closeModal());
+    dispatch({
+      type: ActionType.PAWN_PROMOTION,
+      payload: { pawnPosition, toolPromotion },
+    });
+    playSound(sounds.move);
+    return dispatch({
+      type: ActionType.SWITCH_PLAYER_TURN,
     });
   };

@@ -18,7 +18,6 @@ import { ActionType } from "./ActionType";
 import { moveSetPieceAndChangeSpecialInformation } from "../utils/utils";
 
 export type State = {
-  counter: number;
   user: any;
   currentPlayer: ChessColor;
   waitingPlayer: ChessColor;
@@ -34,12 +33,12 @@ export type State = {
   showModalButton: boolean;
   modalProps: { [key: string]: any };
   modalContent: any;
+  playHistory: string[];
 };
 
 type Action = { type: ActionType; payload: any };
 
 const initialState: State = {
-  counter: 0,
   user: null,
   playersSpecialInformation: {
     [ChessColor.White]: whitePlayerSpecialInformation,
@@ -64,6 +63,7 @@ const initialState: State = {
   modalContent: null,
   showModalButton: false,
   modalProps: {},
+  playHistory: [],
 };
 
 // to debug: console.log(action)
@@ -154,6 +154,11 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         ...initialState,
+      };
+    case ActionType.ADD_TO_PLAY_HISTORY:
+      return {
+        ...state,
+        playHistory: [...state.playHistory, payload],
       };
     case ActionType.OPEN_MODAL:
       return {
