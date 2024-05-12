@@ -1,24 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { chessBoard, colsInBoard } from "../../utils/constants";
 import BoardSquare from "../BoardSquare/BoardSquare";
-import { getOptionsAndGameState, onClickSquare } from "../../context/actions";
+import { onClickSquare } from "../../context/actions";
 import { ChessColor } from "../../utils/types";
 import IconTool from "../IconTool/IconTool";
 
 const Board = () => {
   const { state, dispatch } = useAppContext();
-  const isMountingRef = useRef(true);
 
-  const { playersTools, currentPlayer, possibleOptions, chosenTool } = state;
+  const { playersTools, possibleOptions, chosenTool, playHistory } = state;
 
   useEffect(() => {
-    if (!isMountingRef.current) {
-      dispatch(getOptionsAndGameState());
-    } else {
-      isMountingRef.current = false;
-    }
-  }, [currentPlayer]);
+    console.log("playHistory", playHistory);
+  }, [playHistory]);
 
   return (
     <div className="board" key="board-chess">

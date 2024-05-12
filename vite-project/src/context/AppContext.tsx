@@ -160,6 +160,11 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         playHistory: [...state.playHistory, payload],
       };
+    case ActionType.SET_GAME_STATE:
+      return {
+        ...state,
+        gameState: payload,
+      };
     case ActionType.OPEN_MODAL:
       return {
         ...state,
