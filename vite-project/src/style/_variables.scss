@@ -49,6 +49,7 @@ html[data-theme="light"] {
   --secondary60Color: #{$light-secondary-60-color};
   --ghostWhiteColor: #{$light-chess-white-color};
   --backgroundImage: #{$light-background-image};
+  --borderColor: #{$light-chess-black-color};
 }
 
 html[data-theme="dark"] {
@@ -68,6 +69,7 @@ html[data-theme="dark"] {
   --secondary60Color: #{$dark-secondary-60-color};
   --ghostWhiteColor: #{$dark-chess-white-30-color};
   --backgroundImage: #{$dark-background-image};
+  --borderColor: #{$dark-quaternary-color};
 }
 
 :root {

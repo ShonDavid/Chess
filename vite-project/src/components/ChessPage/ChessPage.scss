@@ -1,69 +1,70 @@
 .chess-page {
-    flex: 1;
-    display: flex;
-    justify-content: center;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  @include for-small-desktop {
+    padding: 30px 10px 0 10px;
+    justify-content: flex-start;
     align-items: center;
-    width: 100%;
-    height: 100%;
+    flex-direction: column;
+  }
+
+  &__graveyard-for-mobile {
+    display: none;
     @include for-small-desktop {
-      padding: 30px 10px 0 10px;
-      justify-content: flex-start;
+      display: flex;
       align-items: center;
-      flex-direction: column;
-    }
+      justify-content: center;
+      margin-left: 15px;
+      margin-bottom: 5px;
+      min-height: 40px;
+      width: calc(100% - 15px);
+      border-radius: 4px;
+      background: var(--chessWhiteColor30Percent);
+      padding: 5px;
 
-    &__graveyard-for-mobile{
-      display: none;
-      @include for-small-desktop {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: 15px;
-        margin-bottom: 5px;
-        min-height: 40px;
-        width: calc(100% - 15px);
-        border-radius: 4px;
-        background: var(--chessWhiteColor30Percent);
-        padding: 5px;
-
-        &:last-child {
-          margin-top: 5px;
-          margin-bottom: 0;
-        }
+      &:last-child {
+        margin-top: 5px;
+        margin-bottom: 0;
       }
     }
-
   }
-  
-  .chess-page__board-container {
-    padding: 15px;
-    border-radius: 10px;
-    background: var(--backgroundComponentColor);
-    width: 700px;
+}
 
-    @include for-small-desktop {
-      width: 600px;
-    }
+.chess-page__board-container {
+  padding: 15px;
+  border-radius: 10px;
+  background: var(--backgroundComponentColor);
+  width: 700px;
+  border: 1px solid var(--borderColor);
 
-    @include for-phone-only {
-      width: 100%;
-    }
-  }
-  
-  .chess-page__graveyard-container {
-    margin-left: 10px;
-    padding: 15px;
-    border-radius: 10px;
-    background: var(--backgroundComponentColor);
-    @include for-small-desktop {
-      display: none;
-    }
+  @include for-small-desktop {
+    width: 600px;
   }
 
-  .chess-page__board-graveyard-container{
-    display: flex;
-
-    @include for-small-desktop {
-      display: contents;
-    }
+  @include for-phone-only {
+    width: 100%;
   }
+}
+
+.chess-page__graveyard-container {
+  margin-left: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  background: var(--backgroundComponentColor);
+  border: 1px solid var(--borderColor);
+  @include for-small-desktop {
+    display: none;
+  }
+}
+
+.chess-page__board-graveyard-container {
+  display: flex;
+
+  @include for-small-desktop {
+    display: contents;
+  }
+}

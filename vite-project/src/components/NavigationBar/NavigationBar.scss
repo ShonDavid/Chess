@@ -5,6 +5,7 @@
   width: 100%;
   background-color: var(--backgroundComponentColor);
   padding: 0 10px;
+  border-bottom: 1px solid var(--borderColor);
 
   &__logo {
     display: flex;
