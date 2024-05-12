@@ -241,7 +241,15 @@ export const chessToolPromotionPawn = [
   ChessTool.Rook,
   ChessTool.Bishop,
   ChessTool.Knight,
-]
+];
+
+export const charOfChessTool = {
+  [ChessTool.Pawn]: "P",
+  [ChessTool.Knight]: "N",
+  [ChessTool.Bishop]: "B",
+  [ChessTool.Rook]: "R",
+  [ChessTool.Queen]: "Q",
+};
 
 export const sounds = {
   move: moveSound,
